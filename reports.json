@@ -1,0 +1,13 @@
+[
+  {
+    "userUid": "279400249",
+    "taskType": "daily",
+    "totalParsed": 167,
+    "submitted": 158,
+    "failed": 3,
+    "whitelistSkipped": 6,
+    "durationSeconds": 0,
+    "timestamp": "2026-06-12T01:24:15.833889",
+    "received_at": "2026-06-11T17:24:16.665737"
+  }
+]
