@@ -1,0 +1,11 @@
+{
+  "userUid": "262887342",
+  "taskType": "temp",
+  "totalParsed": 672,
+  "submitted": 619,
+  "failed": 34,
+  "whitelistSkipped": 19,
+  "durationSeconds": 6259,
+  "timestamp": "2026-06-12T15:41:59.154204",
+  "received_at": "2026-06-12T07:42:00.088555"
+}
