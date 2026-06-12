@@ -647,5 +647,16 @@
     "durationSeconds": 6278,
     "timestamp": "2026-06-12T13:43:20.429267",
     "received_at": "2026-06-12T05:43:22.957097"
+  },
+  {
+    "userUid": "81722514",
+    "taskType": "daily",
+    "totalParsed": 165,
+    "submitted": 150,
+    "failed": 4,
+    "whitelistSkipped": 11,
+    "durationSeconds": 1860,
+    "timestamp": "2026-06-12T13:46:50.184709",
+    "received_at": "2026-06-12T05:46:49.618584"
   }
 ]
