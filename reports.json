@@ -1,13 +1,13 @@
 [
   {
-    "userUid": "268907047",
+    "userUid": "276316468",
     "taskType": "temp",
-    "totalParsed": 440,
-    "submitted": 399,
-    "failed": 27,
-    "whitelistSkipped": 14,
-    "durationSeconds": 5119,
-    "timestamp": "2026-06-13T03:07:34.364691",
-    "received_at": "2026-06-12T19:08:04.825649"
+    "totalParsed": 423,
+    "submitted": 412,
+    "failed": 3,
+    "whitelistSkipped": 8,
+    "durationSeconds": 7819,
+    "timestamp": "2026-06-13T03:43:42.518054",
+    "received_at": "2026-06-12T19:44:05.067755"
   }
 ]
