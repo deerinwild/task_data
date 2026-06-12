@@ -9,5 +9,16 @@
     "durationSeconds": 5086,
     "timestamp": "2026-06-12T18:31:25.207920",
     "received_at": "2026-06-12T10:31:47.426107"
+  },
+  {
+    "userUid": "274178030",
+    "taskType": "temp",
+    "totalParsed": 564,
+    "submitted": 540,
+    "failed": 5,
+    "whitelistSkipped": 19,
+    "durationSeconds": 5299,
+    "timestamp": "2026-06-12T18:42:31.357888",
+    "received_at": "2026-06-12T10:42:32.230865"
   }
 ]
