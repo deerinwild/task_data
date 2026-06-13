@@ -1,57 +1,13 @@
 [
   {
-    "userUid": "259202323",
-    "taskType": "temp",
-    "totalParsed": 439,
-    "submitted": 418,
-    "failed": 7,
-    "whitelistSkipped": 14,
-    "durationSeconds": 6248,
-    "timestamp": "2026-06-13T11:30:19.424389",
-    "received_at": "2026-06-13T03:30:20.127999"
-  },
-  {
-    "userUid": "201966217",
-    "taskType": "temp",
-    "totalParsed": 363,
-    "submitted": 26,
-    "failed": 323,
-    "whitelistSkipped": 14,
-    "durationSeconds": 7102,
-    "timestamp": "2026-06-13T11:31:13.751427",
-    "received_at": "2026-06-13T03:31:14.542585"
-  },
-  {
-    "userUid": "69333230",
-    "taskType": "temp",
-    "totalParsed": 351,
-    "submitted": 72,
-    "failed": 265,
-    "whitelistSkipped": 14,
-    "durationSeconds": 2537,
-    "timestamp": "2026-06-13T11:31:50.238624",
-    "received_at": "2026-06-13T03:31:50.721075"
-  },
-  {
     "userUid": "235470748",
-    "taskType": "temp",
-    "totalParsed": 376,
-    "submitted": 360,
-    "failed": 2,
-    "whitelistSkipped": 14,
-    "durationSeconds": 4104,
-    "timestamp": "2026-06-13T11:32:37.556246",
-    "received_at": "2026-06-13T03:32:38.783073"
-  },
-  {
-    "userUid": "221282113",
-    "taskType": "temp",
-    "totalParsed": 359,
-    "submitted": 343,
-    "failed": 2,
-    "whitelistSkipped": 14,
-    "durationSeconds": 3854,
-    "timestamp": "2026-06-13T11:37:29.520014",
-    "received_at": "2026-06-13T03:37:30.279731"
+    "taskType": "daily",
+    "totalParsed": 58,
+    "submitted": 50,
+    "failed": 0,
+    "whitelistSkipped": 8,
+    "durationSeconds": 580,
+    "timestamp": "2026-06-13T11:46:32.083093",
+    "received_at": "2026-06-13T03:46:33.271705"
   }
 ]
