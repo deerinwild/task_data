@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>任务数据看板</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            background: #f5f5f7;
+            color: #1d1d1f;
+            padding: 20px;
+            line-height: 1.4;
+        }
+
+        .container {
+            max-width: 1440px;
+            margin: 0 auto;
+        }
+
+        /* 苹果风格卡片 */
+        .card {
+            background: #ffffff;
+            border-radius: 18px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03);
+            overflow: hidden;
+        }
+
+        /* 头部区域 */
+        .header {
+            padding: 24px 28px 20px 28px;
+            border-bottom: 0.5px solid #e5e5ea;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+            color: #1d1d1f;
+            margin-bottom: 6px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #6e6e73;
+            margin-bottom: 16px;
+        }
+
+        .badge-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: #f5f5f7;
+            padding: 5px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #1d1d1f;
+        }
+
+        /* 统计卡片网格 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: #ffffff;
+            border-radius: 18px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            overflow: hidden;
+        }
+
+        .stat-header {
+            padding: 16px 20px;
+            font-weight: 600;
+            font-size: 17px;
+            letter-spacing: -0.2px;
+            border-bottom: 0.5px solid #e5e5ea;
+            background: #ffffff;
+            color: #1d1d1f;
+        }
+
+        .stat-body {
+            padding: 20px;
+        }
+
+        /* 全局统计数字卡片布局 */
+        .global-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            justify-content: space-between;
+        }
+
+        .stat-item {
+            flex: 1;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            color: #1d1d1f;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: #6e6e73;
+        }
+
+        /* 用户表格（轻量化） */
+        .user-table-wrapper {
+            overflow-x: auto;
+            max-height: 380px;
+            overflow-y: auto;
+        }
+
+        .user-stats-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .user-stats-table th,
+        .user-stats-table td {
+            padding: 12px 12px;
+            text-align: left;
+            border-bottom: 0.5px solid #e5e5ea;
+        }
+
+        .user-stats-table th {
+            background: #ffffff;
+            font-weight: 600;
+            color: #1d1d1f;
+            font-size: 13px;
+            position: sticky;
+            top: 0;
+        }
+
+        .user-stats-table tr:hover td {
+            background: #f9f9fb;
+        }
+
+        /* 工具栏 */
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 16px 20px;
+            background: #ffffff;
+            border-radius: 18px;
+            margin: 20px 0 16px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+        }
+
+        select {
+            background: #f5f5f7;
+            border: 0.5px solid #d9d9df;
+            border-radius: 40px;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-family: inherit;
+            color: #1d1d1f;
+            cursor: pointer;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        select:focus {
+            border-color: #007aff;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            background: #f5f5f7;
+            border: none;
+            border-radius: 40px;
+            padding: 8px 18px;
+            font-size: 13px;
+            font-weight: 500;
+            font-family: inherit;
+            color: #1d1d1f;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-primary {
+            background: #1d1d1f;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2c2c2e;
+        }
+
+        .btn:hover {
+            background: #e5e5ea;
+        }
+
+        /* 明细表格 */
+        .detail-section {
+            background: #ffffff;
+            border-radius: 18px;
+            margin-top: 20px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .section-title {
+            padding: 18px 20px;
+            font-weight: 600;
+            font-size: 17px;
+            border-bottom: 0.5px solid #e5e5ea;
+            background: #ffffff;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            width: 100%;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 12px 12px;
+            text-align: left;
+            border-bottom: 0.5px solid #e5e5ea;
+        }
+
+        .data-table th {
+            background: #ffffff;
+            font-weight: 600;
+            color: #1d1d1f;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .data-table th:hover {
+            background: #f9f9fb;
+        }
+
+        .data-table tr:hover td {
+            background: #f9f9fb;
+        }
+
+        .loading, .error {
+            text-align: center;
+            padding: 48px 20px;
+            color: #6e6e73;
+            background: #ffffff;
+            border-radius: 18px;
+            margin: 20px 0;
+        }
+
+        .error {
+            color: #ff3b30;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 24px 0 12px;
+            font-size: 12px;
+            color: #8e8e93;
+        }
+
+        .info-note {
+            margin-top: 12px;
+            font-size: 12px;
+            color: #8e8e93;
+            background: #f9f9fb;
+            padding: 8px 12px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 12px;
+            }
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .btn-group {
+                justify-content: flex-start;
+            }
+            .global-stats {
+                gap: 12px;
+            }
+            .stat-number {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="card header">
+        <h1>任务数据看板</h1>
+        <div class="subtitle">个人统计 & 上报明细</div>
+        <div class="badge-group">
+            <span class="badge">自动同步</span>
+            <span class="badge">永久存储</span>
+            <span class="badge">实时刷新</span>
+        </div>
+    </div>
+
+    <!-- 双卡片统计 -->
+    <div class="stats-grid">
+        <!-- 全局概览卡片 -->
+        <div class="stat-card">
+            <div class="stat-header">全局概览 <span style="font-size:12px; font-weight:normal;">(自动上报)</span></div>
+            <div class="stat-body" id="globalStats">
+                <div class="loading" style="padding: 20px;">加载中…</div>
+            </div>
+        </div>
+        <!-- 用户完成情况卡片 -->
+        <div class="stat-card">
+            <div class="stat-header">个人统计 <span style="font-size:12px; font-weight:normal;">(自动上报)</span></div>
+            <div class="user-table-wrapper" id="userStatsTable">
+                <div class="loading" style="padding: 20px;">加载中…</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 工具栏 -->
+    <div class="toolbar">
+        <div class="filter-group">
+            <span>任务类型</span>
+            <select id="typeFilter">
+                <option value="">全部</option>
+                <option value="daily">日常任务</option>
+                <option value="temp">临时任务</option>
+            </select>
+            <span id="recordCount" style="font-size: 13px; color: #6e6e73;"></span>
+        </div>
+        <div class="btn-group">
+            <button id="downloadCsvBtn" class="btn btn-primary">⬇️ 下载 CSV</button>
+            <button id="downloadJsonBtn" class="btn">📄 下载 JSON</button>
+            <button id="refreshBtn" class="btn">🔄 刷新</button>
+        </div>
+    </div>
+
+    <!-- 详细记录表格 -->
+    <div class="detail-section">
+        <div class="section-title">📋 详细上报记录 <span style="font-size:12px; font-weight:normal;">(包含手动上报，耗时为0)</span></div>
+        <div class="table-wrapper" id="detailTableContainer">
+            <div class="loading">加载中…</div>
+        </div>
+    </div>
+
+    <div class="footer">
+        数据来源于 <code>reports_*.json</code> 独立文件 · GitHub API 实时获取
+    </div>
+</div>
+
+<script>
+    // ---------- 配置 ----------
+    const GITHUB_API = 'https://api.github.com/repos/deerinwild/task_data/contents/';
+    const RAW_BASE = 'https://raw.githubusercontent.com/deerinwild/task_data/main/';
+
+    async function githubFetch(url) {
+        const res = await fetch(url, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (compatible; DataViewer/1.0)',
+                'Accept': 'application/vnd.github.v3+json'
+            }
+        });
+        if (!res.ok) {
+            const errText = await res.text();
+            throw new Error(`${res.status} ${res.statusText}: ${errText.slice(0,200)}`);
+        }
+        return res;
+    }
+
+    async function fetchFileList() {
+        const res = await githubFetch(GITHUB_API);
+        const files = await res.json();
+        return files
+            .filter(f => f.name.startsWith('reports_') && f.name.endsWith('.json'))
+            .map(f => f.name)
+            .sort();
+    }
+
+    async function fetchJSON(filename) {
+        const url = RAW_BASE + filename;
+        const res = await fetch(url, { headers: { 'User-Agent': 'DataViewer/1.0' } });
+        if (!res.ok) return null;
+        return await res.json();
+    }
+
+    async function loadAllData() {
+        const files = await fetchFileList();
+        const records = [];
+        for (const file of files) {
+            const data = await fetchJSON(file);
+            if (data) {
+                if (typeof data === 'object' && !Array.isArray(data)) records.push(data);
+                else if (Array.isArray(data)) records.push(...data);
+            }
+        }
+        return records;
+    }
+
+    // 统计仅基于自动上报（durationSeconds > 0）
+    function computeUserStats(records) {
+        const autoRecords = records.filter(r => (r.durationSeconds || 0) > 0);
+        const map = new Map();
+        for (const r of autoRecords) {
+            const uid = r.userUid;
+            if (!uid) continue;
+            if (!map.has(uid)) {
+                map.set(uid, {
+                    uid,
+                    total: 0,
+                    submitted: 0,
+                    failed: 0,
+                    whitelistSkipped: 0,
+                    totalDuration: 0,
+                    taskCount: 0,
+                    dailyCount: 0,
+                    tempCount: 0
+                });
+            }
+            const s = map.get(uid);
+            s.total += r.totalParsed || 0;
+            s.submitted += r.submitted || 0;
+            s.failed += r.failed || 0;
+            s.whitelistSkipped += r.whitelistSkipped || 0;
+            s.totalDuration += r.durationSeconds || 0;
+            s.taskCount++;
+            if (r.taskType === 'daily') s.dailyCount++;
+            else if (r.taskType === 'temp') s.tempCount++;
+        }
+        const stats = Array.from(map.values()).map(u => ({
+            ...u,
+            avgDuration: u.taskCount ? Math.round(u.totalDuration / u.taskCount) : 0
+        }));
+        stats.sort((a,b) => b.submitted - a.submitted);
+        return stats;
+    }
+
+    function renderGlobalStats(records, userStats) {
+        const autoRecords = records.filter(r => (r.durationSeconds || 0) > 0);
+        const totalTasks = autoRecords.length;
+        const totalSubmitted = autoRecords.reduce((s,r) => s + (r.submitted || 0), 0);
+        const totalFailed = autoRecords.reduce((s,r) => s + (r.failed || 0), 0);
+        const totalWhitelist = autoRecords.reduce((s,r) => s + (r.whitelistSkipped || 0), 0);
+        const html = `
+            <div class="global-stats">
+                <div class="stat-item"><div class="stat-number">${totalTasks}</div><div class="stat-label">总上报次数</div></div>
+                <div class="stat-item"><div class="stat-number">${userStats.length}</div><div class="stat-label">参与用户数</div></div>
+                <div class="stat-item"><div class="stat-number">${totalSubmitted}</div><div class="stat-label">成功提交</div></div>
+                <div class="stat-item"><div class="stat-number">${totalFailed}</div><div class="stat-label">失败</div></div>
+                <div class="stat-item"><div class="stat-number">${totalWhitelist}</div><div class="stat-label">白名单跳过</div></div>
+            </div>
+        `;
+        document.getElementById('globalStats').innerHTML = html;
+    }
+
+    function renderUserStatsTable(userStats) {
+        if (!userStats.length) {
+            document.getElementById('userStatsTable').innerHTML = '<div style="padding: 20px; text-align: center;">暂无自动上报数据</div>';
+            return;
+        }
+        let html = `<table class="user-stats-table">
+            <thead><tr><th>用户UID</th><th>上报次数</th><th>总解析数</th><th>成功</th><th>失败</th><th>白名单跳过</th><th>平均耗时(s)</th><th>日常/临时</th></tr></thead><tbody>`;
+        for (const u of userStats) {
+            html += `<tr>
+                <td><code>${u.uid}</code></td>
+                <td>${u.taskCount}</td>
+                <td>${u.total}</td>
+                <td style="font-weight:500;">${u.submitted}</td>
+                <td>${u.failed}</td>
+                <td>${u.whitelistSkipped}</td>
+                <td>${u.avgDuration}</td>
+                <td>${u.dailyCount}/${u.tempCount}</td>
+            </tr>`;
+        }
+        html += `</tbody></table>`;
+        document.getElementById('userStatsTable').innerHTML = html;
+    }
+
+    let allRecords = [];
+    let currentSortColumn = 'timestamp';
+    let currentSortOrder = 'desc';
+    let currentTypeFilter = '';
+
+    function sortRecords(records, col, order) {
+        return [...records].sort((a,b) => {
+            let va = a[col] ?? '', vb = b[col] ?? '';
+            if (col === 'totalParsed' || col === 'submitted' || col === 'failed' || col === 'whitelistSkipped' || col === 'durationSeconds') {
+                va = Number(va); vb = Number(vb);
+            }
+            if (order === 'asc') return va > vb ? 1 : -1;
+            else return va < vb ? 1 : -1;
+        });
+    }
+
+    function renderDetailTable() {
+        let filtered = allRecords;
+        if (currentTypeFilter) filtered = allRecords.filter(r => r.taskType === currentTypeFilter);
+        const sorted = sortRecords(filtered, currentSortColumn, currentSortOrder);
+
+        const headers = ['用户UID', '任务类型', '解析总数', '提交成功', '失败', '白名单跳过', '耗时(秒)', '上报时间', '服务器接收时间'];
+        const keys = ['userUid', 'taskType', 'totalParsed', 'submitted', 'failed', 'whitelistSkipped', 'durationSeconds', 'timestamp', 'received_at'];
+
+        let html = `<table class="data-table" id="detailTable"><thead><tr>`;
+        for (let i=0;i<headers.length;i++) {
+            const key = keys[i];
+            const isCurr = key === currentSortColumn;
+            const arrow = isCurr ? (currentSortOrder === 'asc' ? ' ▲' : ' ▼') : '';
+            html += `<th data-key="${key}">${headers[i]}${arrow}</th>`;
+        }
+        html += `</tr></thead><tbody>`;
+        for (const row of sorted) {
+            html += `<tr>`;
+            for (const k of keys) {
+                let val = row[k] ?? '';
+                if (k === 'timestamp' || k === 'received_at') val = new Date(val).toLocaleString();
+                html += `<td>${val}</td>`;
+            }
+            html += `</tr>`;
+        }
+        html += `</tbody></table>`;
+        document.getElementById('detailTableContainer').innerHTML = html;
+        document.getElementById('recordCount').innerHTML = `共 ${sorted.length} 条记录 (包含手动上报)`;
+
+        document.querySelectorAll('#detailTable th').forEach(th => {
+            th.addEventListener('click', () => {
+                const key = th.getAttribute('data-key');
+                if (currentSortColumn === key) currentSortOrder = currentSortOrder === 'asc' ? 'desc' : 'asc';
+                else { currentSortColumn = key; currentSortOrder = 'asc'; }
+                renderDetailTable();
+            });
+        });
+    }
+
+    function exportToCSV(records) {
+        const headers = ['userUid', 'taskType', 'totalParsed', 'submitted', 'failed', 'whitelistSkipped', 'durationSeconds', 'timestamp', 'received_at'];
+        const rows = records.map(r => headers.map(h => r[h] ?? '').join(','));
+        const csv = [headers.join(','), ...rows].join('\n');
+        const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `task_data_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.csv`;
+        a.click();
+        URL.revokeObjectURL(a.href);
+        alert('CSV 导出成功');
+    }
+
+    function exportToJSON(records) {
+        const json = JSON.stringify(records, null, 2);
+        const blob = new Blob([json], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `task_data_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.json`;
+        a.click();
+        URL.revokeObjectURL(a.href);
+        alert('JSON 导出成功');
+    }
+
+    async function main() {
+        const container = document.getElementById('detailTableContainer');
+        container.innerHTML = '<div class="loading">加载数据…</div>';
+        try {
+            allRecords = await loadAllData();
+            const userStats = computeUserStats(allRecords);
+            renderGlobalStats(allRecords, userStats);
+            renderUserStatsTable(userStats);
+            renderDetailTable();
+        } catch (err) {
+            console.error(err);
+            let msg = err.message;
+            if (msg.includes('403')) msg = '访问受限 (403)，可能是速率限制或网络问题，请稍后刷新。';
+            document.getElementById('detailTableContainer').innerHTML = `<div class="error">加载失败: ${msg}</div>`;
+            document.getElementById('globalStats').innerHTML = `<div class="error">加载失败</div>`;
+            document.getElementById('userStatsTable').innerHTML = `<div class="error">加载失败</div>`;
+        }
+    }
+
+    document.getElementById('refreshBtn').addEventListener('click', main);
+    document.getElementById('downloadCsvBtn').addEventListener('click', () => {
+        if (!allRecords.length) { alert('暂无数据'); return; }
+        const filtered = currentTypeFilter ? allRecords.filter(r => r.taskType === currentTypeFilter) : allRecords;
+        exportToCSV(filtered);
+    });
+    document.getElementById('downloadJsonBtn').addEventListener('click', () => {
+        if (!allRecords.length) { alert('暂无数据'); return; }
+        const filtered = currentTypeFilter ? allRecords.filter(r => r.taskType === currentTypeFilter) : allRecords;
+        exportToJSON(filtered);
+    });
+    document.getElementById('typeFilter').addEventListener('change', (e) => {
+        currentTypeFilter = e.target.value;
+        renderDetailTable();
+    });
+
+    main();
+</script>
+</body>
+</html>
