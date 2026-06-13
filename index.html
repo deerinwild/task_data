@@ -364,7 +364,7 @@
             <span class="badge">自动同步</span>
             <span class="badge">永久存储</span>
             <span class="badge">实时刷新</span>
-            <span class="badge">去重模式</span>
+            <span class="badge">智能去重</span>
             <span class="badge">微博聚合</span>
         </div>
     </div>
@@ -399,6 +399,7 @@
                 <option value="">全部</option>
                 <option value="daily">日常任务</option>
                 <option value="temp">临时任务</option>
+                <option value="local">本地任务</option>
             </select>
             <span id="recordCount" style="font-size: 13px; color: #6e6e73;"></span>
         </div>
@@ -417,6 +418,7 @@
     <div class="footer">
         数据实时获取，网络稍有延迟。<br>
         去重规则：同一用户，若总解析数和白名单数相同，且记录时间差 ≤ 1小时，则只保留提交数最高的记录。<br>
+        本地任务不参与去重，始终保留。
     </div>
 </div>
 
@@ -508,7 +510,7 @@
         return records;
     }
 
-    // 去重函数：按原始豆瓣UID去重（因为映射后合并是在统计时进行的，去重应在映射前）
+    // 去重函数：本地任务（taskType === 'local'）不参与去重，直接保留
     function deduplicateRecords(records) {
         const userGroups = new Map();
         for (const r of records) {
@@ -520,7 +522,21 @@
 
         const result = [];
         for (const [uid, userRecs] of userGroups.entries()) {
-            const sorted = [...userRecs].sort((a,b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+            // 分离本地任务和非本地任务
+            const localRecs = [];
+            const normalRecs = [];
+            for (const rec of userRecs) {
+                if (rec.taskType === 'local') {
+                    localRecs.push(rec);
+                } else {
+                    normalRecs.push(rec);
+                }
+            }
+            // 本地任务全部保留
+            result.push(...localRecs);
+
+            // 非本地任务进行去重处理
+            const sorted = [...normalRecs].sort((a,b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
             const used = new Array(sorted.length).fill(false);
             for (let i = 0; i < sorted.length; i++) {
                 if (used[i]) continue;
@@ -586,6 +602,7 @@
             s.taskCount++;
             if (r.taskType === 'daily') s.dailyCount++;
             else if (r.taskType === 'temp') s.tempCount++;
+            // 本地任务不计入日常/临时列，但总计数已包含
         }
         const stats = Array.from(map.values()).map(s => ({
             displayUser: s.displayUser,
@@ -613,10 +630,10 @@
         const html = `
             <div class="global-stats">
                 <div class="stat-item"><div class="stat-number">${totalTasks}</div><div class="stat-label">上报次数</div></div>
-                <div class="stat-item"><div class="stat-number">${userStats.length}</div><div class="stat-label">参与人数</div></div>
+                <div class="stat-item"><div class="stat-number">${userStats.length}</div><div class="stat-label">参与用户数(微博)</div></div>
                 <div class="stat-item"><div class="stat-number">${totalSubmitted}</div><div class="stat-label">成功提交</div></div>
-                <div class="stat-item"><div class="stat-number">${totalFailed}</div><div class="stat-label">提交失败</div></div>
-                <div class="stat-item"><div class="stat-number">${totalWhitelist}</div><div class="stat-label">跳白名单</div></div>
+                <div class="stat-item"><div class="stat-number">${totalFailed}</div><div class="stat-label">失败</div></div>
+                <div class="stat-item"><div class="stat-number">${totalWhitelist}</div><div class="stat-label">白名单跳过</div></div>
             </div>
         `;
         document.getElementById('globalStats').innerHTML = html;
@@ -699,7 +716,7 @@
             }
             html += `</tr>`;
         }
-        html += `</tbody></table>`;
+        html += `</tbody></tr>`;
         document.getElementById('detailTableContainer').innerHTML = html;
         document.getElementById('recordCount').innerHTML = `共 ${sorted.length} 条记录 (原始数据)`;
         document.querySelectorAll('#detailTable th').forEach(th => {
