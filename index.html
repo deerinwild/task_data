@@ -153,7 +153,8 @@
         <div class="loading">正在加载数据...</div>
     </div>
     <div class="footer">
-        数据来源：本仓库中的所有 <code>reports_*.json</code> 文件（每次上报自动生成）。页面通过 GitHub API 获取文件列表并合并展示。
+        数据来源：本仓库中的所有 <code>reports_*.json</code> 文件（每次上报自动生成）。页面通过 GitHub API 获取文件列表并合并展示。<br>
+        <span style="font-size: 11px;">如果加载失败，可能是 GitHub API 速率限制（每小时60次），请稍后刷新。</span>
     </div>
 </div>
 <div id="toastMsg" class="toast-msg"></div>
@@ -162,6 +163,21 @@
     // ---------- 配置 ----------
     const GITHUB_API = 'https://api.github.com/repos/deerinwild/task_data/contents/';
     const RAW_BASE = 'https://raw.githubusercontent.com/deerinwild/task_data/main/';
+
+    // 通用 fetch 函数，添加必要的 headers
+    async function githubFetch(url) {
+        const response = await fetch(url, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (compatible; DataViewer/1.0)',
+                'Accept': 'application/vnd.github.v3+json'
+            }
+        });
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`${response.status} ${response.statusText}: ${errorText.slice(0, 200)}`);
+        }
+        return response;
+    }
 
     // 显示提示消息
     function showMsg(msg) {
@@ -175,10 +191,7 @@
 
     // 获取仓库中的所有 reports_*.json 文件
     async function fetchFileList() {
-        const response = await fetch(GITHUB_API);
-        if (!response.ok) {
-            throw new Error(`无法获取文件列表: ${response.status}`);
-        }
+        const response = await githubFetch(GITHUB_API);
         const files = await response.json();
         // 筛选出 reports_ 开头的 .json 文件
         return files
@@ -190,7 +203,9 @@
     // 获取单个 JSON 文件内容
     async function fetchJSON(filename) {
         const url = RAW_BASE + filename;
-        const response = await fetch(url);
+        const response = await fetch(url, {
+            headers: { 'User-Agent': 'Mozilla/5.0 (compatible; DataViewer/1.0)' }
+        });
         if (!response.ok) {
             console.warn(`无法加载 ${filename}: ${response.status}`);
             return null;
@@ -339,7 +354,11 @@
             renderTable(allRecords);
         } catch (err) {
             console.error(err);
-            container.innerHTML = `<div class="error">加载失败: ${err.message}<br>请检查网络或确认仓库是公开的，且存在 reports_*.json 文件。</div>`;
+            let errorMsg = err.message;
+            if (err.message.includes('403')) {
+                errorMsg = 'GitHub API 访问受限 (403)。可能是速率限制（每小时60次）或缺少 User-Agent。请稍后刷新页面，或尝试使用其他网络。';
+            }
+            container.innerHTML = `<div class="error">加载失败: ${errorMsg}<br>请检查网络或确认仓库是公开的，且存在 reports_*.json 文件。</div>`;
             document.getElementById('recordCount').innerText = '加载失败';
         }
     }
