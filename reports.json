@@ -779,5 +779,16 @@
     "durationSeconds": 3498,
     "timestamp": "2026-06-13T19:11:30.407036",
     "received_at": "2026-06-13T11:11:31.449473"
+  },
+  {
+    "userUid": "285366332",
+    "taskType": "temp",
+    "totalParsed": 305,
+    "submitted": 288,
+    "failed": 8,
+    "whitelistSkipped": 9,
+    "durationSeconds": 4057,
+    "timestamp": "2026-06-13T19:12:19.161410",
+    "received_at": "2026-06-13T11:12:19.962117"
   }
 ]
