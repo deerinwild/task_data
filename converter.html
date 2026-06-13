@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV 转 mapping.json 工具</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: #f5f5f7;
+            padding: 24px;
+            margin: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        .header {
+            padding: 24px 32px;
+            border-bottom: 1px solid #e5e5ea;
+        }
+        h1 {
+            margin: 0 0 8px 0;
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+        }
+        .sub {
+            color: #6e6e73;
+            font-size: 14px;
+        }
+        .two-columns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            padding: 24px 32px;
+        }
+        .column {
+            flex: 1;
+            min-width: 280px;
+        }
+        .label {
+            font-weight: 600;
+            margin-bottom: 12px;
+            font-size: 15px;
+        }
+        textarea {
+            width: 100%;
+            height: 400px;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+            font-size: 13px;
+            padding: 12px;
+            border: 1px solid #d9d9df;
+            border-radius: 12px;
+            resize: vertical;
+            background: #fafafc;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: #007aff;
+        }
+        .toolbar {
+            margin-top: 16px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        button {
+            background: #1d1d1f;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            padding: 8px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        button:hover {
+            background: #3a3a3c;
+        }
+        .copy-btn {
+            background: #6c757d;
+        }
+        .copy-btn:hover {
+            background: #5a6268;
+        }
+        .message {
+            margin-top: 12px;
+            font-size: 13px;
+            color: #28a745;
+            background: #e6f7e6;
+            padding: 8px 16px;
+            border-radius: 40px;
+            display: inline-block;
+        }
+        .error {
+            color: #d32f2f;
+            background: #ffebee;
+        }
+        pre {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 16px;
+            border-radius: 12px;
+            overflow-x: auto;
+            font-size: 12px;
+            max-height: 400px;
+        }
+        footer {
+            padding: 16px 32px;
+            border-top: 1px solid #e5e5ea;
+            font-size: 12px;
+            color: #8e8e93;
+            text-align: center;
+        }
+        @media (max-width: 640px) {
+            body { padding: 12px; }
+            .two-columns { padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>📄 CSV → mapping.json 转换器</h1>
+        <div class="sub">将“微博uid,豆瓣uid”格式的表格快速转换为 mapping.json 格式（同一微博uid的豆瓣uid自动合并为数组）</div>
+    </div>
+    <div class="two-columns">
+        <div class="column">
+            <div class="label">📋 输入 CSV（第一列微博uid，第二列豆瓣uid，可包含表头行）</div>
+            <textarea id="csvInput" placeholder="示例：
+微博uid,豆瓣uid
+7757042792,276700101
+7757042792,245846041
+7757042792,279400249
+7874777712,81722514
+2281381197,2763333597
+7063892880,276121729"></textarea>
+            <div class="toolbar">
+                <button id="convertBtn">🔄 转换</button>
+                <button id="clearBtn">🗑️ 清空</button>
+            </div>
+            <div id="inputMsg" class="message" style="display: none;"></div>
+        </div>
+        <div class="column">
+            <div class="label">✨ 输出 JSON（mapping.json 格式）</div>
+            <pre id="jsonOutput">等待转换...</pre>
+            <div class="toolbar">
+                <button id="copyBtn" class="copy-btn">📋 复制 JSON</button>
+                <button id="downloadBtn">💾 下载 mapping.json</button>
+            </div>
+            <div id="outputMsg" class="message" style="display: none;"></div>
+        </div>
+    </div>
+    <footer>
+        💡 说明：CSV 第一列作为微博用户标识（key），第二列为豆瓣UID（value）。同一微博用户的所有豆瓣UID会自动合并到同一个数组中。<br>
+        生成的 JSON 可直接保存为 <code>mapping.json</code> 并上传到仓库根目录。
+    </footer>
+</div>
+
+<script>
+    const csvInput = document.getElementById('csvInput');
+    const jsonOutput = document.getElementById('jsonOutput');
+    const convertBtn = document.getElementById('convertBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const copyBtn = document.getElementById('copyBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const inputMsg = document.getElementById('inputMsg');
+    const outputMsg = document.getElementById('outputMsg');
+
+    function showMessage(element, text, isError = false) {
+        element.textContent = text;
+        element.style.display = 'inline-block';
+        if (isError) {
+            element.classList.add('error');
+        } else {
+            element.classList.remove('error');
+        }
+        setTimeout(() => {
+            element.style.display = 'none';
+        }, 3000);
+    }
+
+    function convertCSVtoJSON(csvText) {
+        const lines = csvText.trim().split(/\r?\n/);
+        if (lines.length === 0) throw new Error('没有数据');
+
+        // 跳过可能的第一行表头（如果第一行包含“微博”或“uid”等字样）
+        let startIdx = 0;
+        if (lines[0].toLowerCase().includes('微博') || lines[0].toLowerCase().includes('uid')) {
+            startIdx = 1;
+        }
+
+        const mapping = {};
+        for (let i = startIdx; i < lines.length; i++) {
+            const line = lines[i].trim();
+            if (line === '') continue;
+            const parts = line.split(',');
+            if (parts.length < 2) continue;
+            const weiboUid = parts[0].trim();
+            const doubanUid = parts[1].trim();
+            if (!weiboUid || !doubanUid) continue;
+            if (!mapping[weiboUid]) mapping[weiboUid] = [];
+            if (!mapping[weiboUid].includes(doubanUid)) {
+                mapping[weiboUid].push(doubanUid);
+            }
+        }
+
+        if (Object.keys(mapping).length === 0) {
+            throw new Error('未解析到有效数据，请检查格式（第一列微博uid，第二列豆瓣uid）');
+        }
+        return mapping;
+    }
+
+    function renderJSON(mapping) {
+        jsonOutput.textContent = JSON.stringify(mapping, null, 2);
+    }
+
+    convertBtn.addEventListener('click', () => {
+        const csvText = csvInput.value;
+        if (!csvText.trim()) {
+            showMessage(inputMsg, '❌ 请粘贴 CSV 数据', true);
+            return;
+        }
+        try {
+            const mapping = convertCSVtoJSON(csvText);
+            renderJSON(mapping);
+            showMessage(outputMsg, '✅ 转换成功！');
+        } catch (err) {
+            showMessage(inputMsg, `❌ 转换失败: ${err.message}`, true);
+            jsonOutput.textContent = '// 解析错误，请检查 CSV 格式';
+        }
+    });
+
+    clearBtn.addEventListener('click', () => {
+        csvInput.value = '';
+        jsonOutput.textContent = '等待转换...';
+        showMessage(inputMsg, '已清空');
+    });
+
+    copyBtn.addEventListener('click', () => {
+        const json = jsonOutput.textContent;
+        if (!json || json === '等待转换...' || json.startsWith('// 解析错误')) {
+            showMessage(outputMsg, '❌ 没有可复制的 JSON', true);
+            return;
+        }
+        navigator.clipboard.writeText(json).then(() => {
+            showMessage(outputMsg, '📋 JSON 已复制到剪贴板');
+        }).catch(() => {
+            showMessage(outputMsg, '❌ 复制失败，请手动复制', true);
+        });
+    });
+
+    downloadBtn.addEventListener('click', () => {
+        const json = jsonOutput.textContent;
+        if (!json || json === '等待转换...' || json.startsWith('// 解析错误')) {
+            showMessage(outputMsg, '❌ 没有有效的 JSON 可下载', true);
+            return;
+        }
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'mapping.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showMessage(outputMsg, '💾 mapping.json 已下载');
+    });
+
+    // 预填示例数据方便测试
+    const exampleData = `微博uid,豆瓣uid
+7757042792,276700101
+7757042792,245846041
+7757042792,279400249
+7874777712,81722514
+2281381197,2763333597
+7063892880,276121729`;
+    csvInput.value = exampleData;
+    // 自动转换一次以便展示
+    setTimeout(() => {
+        convertBtn.click();
+    }, 100);
+</script>
+</body>
+</html>
