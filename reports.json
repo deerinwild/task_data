@@ -1,79 +1,13 @@
 [
   {
-    "userUid": "193901806",
-    "taskType": "temp",
-    "totalParsed": 358,
-    "submitted": 328,
-    "failed": 16,
-    "whitelistSkipped": 14,
-    "durationSeconds": 3900,
-    "timestamp": "2026-06-13T09:23:28.741269",
-    "received_at": "2026-06-13T01:23:51.247803"
-  },
-  {
-    "userUid": "250130299",
-    "taskType": "temp",
-    "totalParsed": 390,
-    "submitted": 339,
-    "failed": 37,
-    "whitelistSkipped": 14,
-    "durationSeconds": 4802,
-    "timestamp": "2026-06-13T09:24:30.827262",
-    "received_at": "2026-06-13T01:24:31.663765"
-  },
-  {
-    "userUid": "161107506",
-    "taskType": "temp",
-    "totalParsed": 347,
-    "submitted": 329,
-    "failed": 4,
-    "whitelistSkipped": 14,
-    "durationSeconds": 4057,
-    "timestamp": "2026-06-13T09:34:58.222749",
-    "received_at": "2026-06-13T01:34:58.714389"
-  },
-  {
-    "userUid": "161107506",
-    "taskType": "daily",
-    "totalParsed": 58,
-    "submitted": 50,
-    "failed": 0,
-    "whitelistSkipped": 8,
-    "durationSeconds": 631,
-    "timestamp": "2026-06-13T09:48:00.894545",
-    "received_at": "2026-06-13T01:48:01.154619"
-  },
-  {
-    "userUid": "69333230",
-    "taskType": "daily",
-    "totalParsed": 58,
-    "submitted": 16,
-    "failed": 34,
-    "whitelistSkipped": 8,
-    "durationSeconds": 395,
-    "timestamp": "2026-06-13T09:54:27.104603",
-    "received_at": "2026-06-13T01:54:27.693236"
-  },
-  {
     "userUid": "69333230",
     "taskType": "temp",
     "totalParsed": 350,
-    "submitted": 3,
-    "failed": 1,
+    "submitted": 72,
+    "failed": 264,
     "whitelistSkipped": 14,
-    "durationSeconds": 39,
-    "timestamp": "2026-06-13T10:00:52.293721",
-    "received_at": "2026-06-13T02:00:52.601018"
-  },
-  {
-    "userUid": "227537513",
-    "taskType": "temp",
-    "totalParsed": 439,
-    "submitted": 383,
-    "failed": 42,
-    "whitelistSkipped": 14,
-    "durationSeconds": 4544,
-    "timestamp": "2026-06-13T10:00:54.283836",
-    "received_at": "2026-06-13T02:00:54.914953"
+    "durationSeconds": 2476,
+    "timestamp": "2026-06-13T10:42:30.298383",
+    "received_at": "2026-06-13T02:42:52.080033"
   }
 ]
