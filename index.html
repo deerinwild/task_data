@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>豆瓣举报任务数据总览</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f5f5f7;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 20px;
+        }
+        h1 {
+            font-size: 24px;
+            margin-top: 0;
+            color: #1d1d1f;
+        }
+        .toolbar {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .btn {
+            background-color: #1d1d1f;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn:hover {
+            background-color: #3a3a3c;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        th, td {
+            border: 1px solid #e5e5ea;
+            padding: 8px 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f5f5f7;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+        tr:nth-child(even) {
+            background-color: #fafafc;
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #8e8e93;
+            text-align: center;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #8e8e93;
+        }
+        .error {
+            color: #d32f2f;
+            background-color: #ffebee;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>📊 豆瓣举报任务数据总览</h1>
+    <div class="toolbar">
+        <button id="downloadCsvBtn" class="btn">⬇️ 下载 CSV</button>
+        <button id="refreshBtn" class="btn btn-secondary">🔄 刷新</button>
+        <span id="recordCount" style="font-size:13px; color:#6e6e73;">加载中...</span>
+    </div>
+    <div id="tableContainer">
+        <div class="loading">正在加载数据...</div>
+    </div>
+    <div class="footer">
+        数据来源：本仓库中的所有 <code>reports_*.json</code> 文件（每次上报自动生成）。页面通过 GitHub API 获取文件列表并合并展示。
+    </div>
+</div>
+
+<script>
+    const GITHUB_API = 'https://api.github.com/repos/deerinwild/task_data/contents/';
+    const RAW_BASE = 'https://raw.githubusercontent.com/deerinwild/task_data/main/';
+
+    // 获取仓库中的所有 reports_*.json 文件
+    async function fetchFileList() {
+        const response = await fetch(GITHUB_API);
+        if (!response.ok) {
+            throw new Error(`无法获取文件列表: ${response.status}`);
+        }
+        const files = await response.json();
+        // 筛选出 reports_ 开头的 .json 文件
+        return files
+            .filter(f => f.name.startsWith('reports_') && f.name.endsWith('.json'))
+            .map(f => f.name)
+            .sort(); // 按文件名排序（即时间戳顺序）
+    }
+
+    // 获取单个 JSON 文件内容
+    async function fetchJSON(filename) {
+        const url = RAW_BASE + filename;
+        const response = await fetch(url);
+        if (!response.ok) {
+            console.warn(`无法加载 ${filename}: ${response.status}`);
+            return null;
+        }
+        const data = await response.json();
+        return data;
+    }
+
+    // 合并所有记录
+    async function loadAllData() {
+        const files = await fetchFileList();
+        const records = [];
+        for (const file of files) {
+            const data = await fetchJSON(file);
+            if (data) {
+                // 每个独立文件应该是单条记录（对象）
+                if (typeof data === 'object' && !Array.isArray(data)) {
+                    records.push(data);
+                } else if (Array.isArray(data)) {
+                    records.push(...data);
+                }
+            }
+        }
+        return records;
+    }
+
+    // 渲染表格
+    function renderTable(records) {
+        if (records.length === 0) {
+            document.getElementById('tableContainer').innerHTML = '<div class="loading">暂无数据</div>';
+            document.getElementById('recordCount').innerText = '总记录数: 0';
+            return;
+        }
+
+        const headers = ['用户UID', '任务类型', '解析总数', '提交成功', '失败', '白名单跳过', '耗时(秒)', '上报时间', '服务器接收时间'];
+        const keys = ['userUid', 'taskType', 'totalParsed', 'submitted', 'failed', 'whitelistSkipped', 'durationSeconds', 'timestamp', 'received_at'];
+
+        let html = '<div style="overflow-x: auto;"><table><thead><tr>';
+        for (const h of headers) {
+            html += `<th>${h}</th>`;
+        }
+        html += '</tr></thead><tbody>';
+
+        for (const row of records) {
+            html += '<tr>';
+            for (const k of keys) {
+                let val = row[k] ?? '';
+                if (k === 'timestamp' || k === 'received_at') {
+                    val = new Date(val).toLocaleString();
+                }
+                html += `<td>${val}</td>`;
+            }
+            html += '</tr>';
+        }
+        html += '</tbody></table></div>';
+        document.getElementById('tableContainer').innerHTML = html;
+        document.getElementById('recordCount').innerText = `总记录数: ${records.length}`;
+    }
+
+    // 导出 CSV
+    function exportToCSV(records) {
+        const headers = ['userUid', 'taskType', 'totalParsed', 'submitted', 'failed', 'whitelistSkipped', 'durationSeconds', 'timestamp', 'received_at'];
+        const rows = records.map(r => headers.map(h => r[h] ?? '').join(','));
+        const csvContent = [headers.join(','), ...rows].join('\n');
+        const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.href = url;
+        link.setAttribute('download', `task_data_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }
+
+    let currentRecords = [];
+
+    async function main() {
+        const container = document.getElementById('tableContainer');
+        container.innerHTML = '<div class="loading">正在加载数据...</div>';
+        try {
+            currentRecords = await loadAllData();
+            renderTable(currentRecords);
+        } catch (err) {
+            console.error(err);
+            container.innerHTML = `<div class="error">加载失败: ${err.message}<br>请检查网络或确认仓库是公开的，且存在 reports_*.json 文件。</div>`;
+            document.getElementById('recordCount').innerText = '加载失败';
+        }
+    }
+
+    document.getElementById('refreshBtn').addEventListener('click', () => main());
+    document.getElementById('downloadCsvBtn').addEventListener('click', () => {
+        if (currentRecords.length === 0) {
+            alert('暂无数据可导出');
+            return;
+        }
+        exportToCSV(currentRecords);
+    });
+
+    main();
+</script>
+</body>
+</html>
