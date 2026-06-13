@@ -24,7 +24,6 @@
             margin: 0 auto;
         }
 
-        /* 苹果风格卡片 */
         .card {
             background: #ffffff;
             border-radius: 18px;
@@ -32,7 +31,6 @@
             overflow: hidden;
         }
 
-        /* 头部区域 */
         .header {
             padding: 24px 28px 20px 28px;
             border-bottom: 0.5px solid #e5e5ea;
@@ -67,10 +65,9 @@
             color: #1d1d1f;
         }
 
-        /* 统计卡片网格 */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
             gap: 16px;
             margin: 20px 0;
         }
@@ -89,14 +86,23 @@
             letter-spacing: -0.2px;
             border-bottom: 0.5px solid #e5e5ea;
             background: #ffffff;
-            color: #1d1d1f;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-header .toggle {
+            font-size: 13px;
+            font-weight: normal;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .stat-body {
             padding: 20px;
         }
 
-        /* 全局统计数字卡片布局 */
         .global-stats {
             display: flex;
             flex-wrap: wrap;
@@ -123,10 +129,9 @@
             color: #6e6e73;
         }
 
-        /* 用户表格（轻量化） */
         .user-table-wrapper {
             overflow-x: auto;
-            max-height: 380px;
+            max-height: 400px;
             overflow-y: auto;
         }
 
@@ -156,7 +161,6 @@
             background: #f9f9fb;
         }
 
-        /* 工具栏 */
         .toolbar {
             display: flex;
             flex-wrap: wrap;
@@ -187,7 +191,6 @@
             color: #1d1d1f;
             cursor: pointer;
             outline: none;
-            transition: 0.2s;
         }
 
         select:focus {
@@ -225,7 +228,6 @@
             background: #e5e5ea;
         }
 
-        /* 明细表格 */
         .detail-section {
             background: #ffffff;
             border-radius: 18px;
@@ -296,33 +298,52 @@
             color: #8e8e93;
         }
 
-        .info-note {
-            margin-top: 12px;
-            font-size: 12px;
-            color: #8e8e93;
-            background: #f9f9fb;
-            padding: 8px 12px;
-            border-radius: 10px;
+        .switch {
+            position: relative;
             display: inline-block;
+            width: 36px;
+            height: 20px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.2s;
+            border-radius: 20px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: 0.2s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #1d1d1f;
+        }
+        input:checked + .slider:before {
+            transform: translateX(16px);
         }
 
         @media (max-width: 640px) {
-            body {
-                padding: 12px;
-            }
-            .toolbar {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .btn-group {
-                justify-content: flex-start;
-            }
-            .global-stats {
-                gap: 12px;
-            }
-            .stat-number {
-                font-size: 28px;
-            }
+            body { padding: 12px; }
+            .toolbar { flex-direction: column; align-items: stretch; }
+            .btn-group { justify-content: flex-start; }
+            .global-stats { gap: 12px; }
+            .stat-number { font-size: 28px; }
         }
     </style>
 </head>
@@ -333,30 +354,35 @@
         <div class="subtitle">个人统计 & 上报明细</div>
         <div class="badge-group">
             <span class="badge">自动同步</span>
-            <span class="badge">永久存储</span>
+            <span class="badge">定期存储</span>
             <span class="badge">实时刷新</span>
+            <span class="badge">智能去重</span>
         </div>
     </div>
 
-    <!-- 双卡片统计 -->
     <div class="stats-grid">
-        <!-- 全局概览卡片 -->
         <div class="stat-card">
-            <div class="stat-header">全局概览 <span style="font-size:12px; font-weight:normal;">(自动上报)</span></div>
-            <div class="stat-body" id="globalStats">
-                <div class="loading" style="padding: 20px;">加载中…</div>
+            <div class="stat-header">
+                <span>全局概览</span>
+                <div class="toggle">
+                    <span style="font-size:12px;">去重模式</span>
+                    <label class="switch">
+                        <input type="checkbox" id="dedupToggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
             </div>
+            <div class="stat-body" id="globalStats"><div class="loading">加载中…</div></div>
         </div>
-        <!-- 用户完成情况卡片 -->
         <div class="stat-card">
-            <div class="stat-header">个人统计 <span style="font-size:12px; font-weight:normal;">(自动上报)</span></div>
-            <div class="user-table-wrapper" id="userStatsTable">
-                <div class="loading" style="padding: 20px;">加载中…</div>
+            <div class="stat-header">
+                <span>个人统计</span>
+                <span style="font-size:12px; font-weight:normal;" id="dedupIndicator"></span>
             </div>
+            <div class="user-table-wrapper" id="userStatsTable"><div class="loading">加载中…</div></div>
         </div>
     </div>
 
-    <!-- 工具栏 -->
     <div class="toolbar">
         <div class="filter-group">
             <span>任务类型</span>
@@ -368,22 +394,20 @@
             <span id="recordCount" style="font-size: 13px; color: #6e6e73;"></span>
         </div>
         <div class="btn-group">
-            <button id="downloadCsvBtn" class="btn btn-primary">⬇️ 下载 CSV</button>
-            <button id="downloadJsonBtn" class="btn">📄 下载 JSON</button>
-            <button id="refreshBtn" class="btn">🔄 刷新</button>
+            <button id="downloadCsvBtn" class="btn btn-primary">下载 CSV</button>
+            <button id="downloadJsonBtn" class="btn">下载 JSON</button>
+            <button id="refreshBtn" class="btn">刷新</button>
         </div>
     </div>
 
-    <!-- 详细记录表格 -->
     <div class="detail-section">
-        <div class="section-title">📋 详细上报记录 <span style="font-size:12px; font-weight:normal;">(包含手动上报，耗时为0)</span></div>
-        <div class="table-wrapper" id="detailTableContainer">
-            <div class="loading">加载中…</div>
-        </div>
+        <div class="section-title">上报明细 <span style="font-size:12px; font-weight:normal;">(原始数据，不受去重影响)</span></div>
+        <div class="table-wrapper" id="detailTableContainer"><div class="loading">加载中…</div></div>
     </div>
 
     <div class="footer">
-        数据实时获取，网络可能稍有延迟
+        数据实时获取，网络可能稍有延迟。<br>
+        去重规则：同一用户，若总解析数和白名单数相同，且任意两条记录时间差 ≤ 1小时，则只保留提交数最高的记录。
     </div>
 </div>
 
@@ -391,7 +415,15 @@
     // ---------- 配置 ----------
     const GITHUB_API = 'https://api.github.com/repos/deerinwild/task_data/contents/';
     const RAW_BASE = 'https://raw.githubusercontent.com/deerinwild/task_data/main/';
+    const ONE_HOUR = 3600 * 1000; // 1小时毫秒数
 
+    let dedupEnabled = false;
+    let allRecords = [];
+    let currentSortColumn = 'timestamp';
+    let currentSortOrder = 'desc';
+    let currentTypeFilter = '';
+
+    // 通用 fetch
     async function githubFetch(url) {
         const res = await fetch(url, {
             headers: {
@@ -409,10 +441,7 @@
     async function fetchFileList() {
         const res = await githubFetch(GITHUB_API);
         const files = await res.json();
-        return files
-            .filter(f => f.name.startsWith('reports_') && f.name.endsWith('.json'))
-            .map(f => f.name)
-            .sort();
+        return files.filter(f => f.name.startsWith('reports_') && f.name.endsWith('.json')).map(f => f.name).sort();
     }
 
     async function fetchJSON(filename) {
@@ -435,9 +464,67 @@
         return records;
     }
 
-    // 统计仅基于自动上报（durationSeconds > 0）
-    function computeUserStats(records) {
-        const autoRecords = records.filter(r => (r.durationSeconds || 0) > 0);
+    // 新的去重函数：按用户分组，对每个用户，找出所有 totalParsed 和 whitelistSkipped 相同的记录，
+    // 如果其中任意两条记录的时间戳差值 <= 1小时，则视为重复组，只保留 submitted 最高的那条。
+    function deduplicateRecords(records) {
+        // 先按用户分组
+        const userGroups = new Map(); // uid -> array
+        for (const r of records) {
+            const uid = r.userUid;
+            if (!uid) continue;
+            if (!userGroups.has(uid)) userGroups.set(uid, []);
+            userGroups.get(uid).push(r);
+        }
+
+        const result = [];
+        for (const [uid, userRecs] of userGroups.entries()) {
+            // 按时间戳排序（升序）
+            const sorted = [...userRecs].sort((a,b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+            const groups = []; // 存储去重后的组
+            const used = new Array(sorted.length).fill(false);
+
+            for (let i = 0; i < sorted.length; i++) {
+                if (used[i]) continue;
+                const current = sorted[i];
+                const total = current.totalParsed;
+                const white = current.whitelistSkipped;
+                // 找出与当前记录 totalParsed 和 whitelistSkipped 相同且时间差在1小时内的所有记录索引
+                const sameGroup = [i];
+                for (let j = i+1; j < sorted.length; j++) {
+                    if (used[j]) continue;
+                    const other = sorted[j];
+                    if (other.totalParsed !== total || other.whitelistSkipped !== white) continue;
+                    // 检查时间差
+                    const timeCurrent = new Date(current.timestamp).getTime();
+                    const timeOther = new Date(other.timestamp).getTime();
+                    if (Math.abs(timeCurrent - timeOther) <= ONE_HOUR) {
+                        sameGroup.push(j);
+                    }
+                }
+                // 如果找到多个，则选取其中 submitted 最大的那条
+                if (sameGroup.length > 1) {
+                    let bestIdx = sameGroup[0];
+                    for (let idx of sameGroup) {
+                        if (sorted[idx].submitted > sorted[bestIdx].submitted) bestIdx = idx;
+                    }
+                    result.push(sorted[bestIdx]);
+                    sameGroup.forEach(idx => used[idx] = true);
+                } else {
+                    // 单个，直接保留
+                    result.push(current);
+                    used[i] = true;
+                }
+            }
+        }
+        return result;
+    }
+
+    // 统计基于自动上报 (durationSeconds > 0) 且可选去重
+    function computeUserStats(records, dedup) {
+        let autoRecords = records.filter(r => (r.durationSeconds || 0) > 0);
+        if (dedup) {
+            autoRecords = deduplicateRecords(autoRecords);
+        }
         const map = new Map();
         for (const r of autoRecords) {
             const uid = r.userUid;
@@ -456,7 +543,8 @@
                 });
             }
             const s = map.get(uid);
-            s.total += r.totalParsed || 0;
+            const processed = (r.submitted || 0) + (r.failed || 0) + (r.whitelistSkipped || 0);
+            s.total += processed;
             s.submitted += r.submitted || 0;
             s.failed += r.failed || 0;
             s.whitelistSkipped += r.whitelistSkipped || 0;
@@ -473,15 +561,16 @@
         return stats;
     }
 
-    function renderGlobalStats(records, userStats) {
-        const autoRecords = records.filter(r => (r.durationSeconds || 0) > 0);
+    function renderGlobalStats(records, userStats, dedup) {
+        let autoRecords = records.filter(r => (r.durationSeconds || 0) > 0);
+        if (dedup) autoRecords = deduplicateRecords(autoRecords);
         const totalTasks = autoRecords.length;
         const totalSubmitted = autoRecords.reduce((s,r) => s + (r.submitted || 0), 0);
         const totalFailed = autoRecords.reduce((s,r) => s + (r.failed || 0), 0);
         const totalWhitelist = autoRecords.reduce((s,r) => s + (r.whitelistSkipped || 0), 0);
         const html = `
             <div class="global-stats">
-                <div class="stat-item"><div class="stat-number">${totalTasks}</div><div class="stat-label">总上报次数</div></div>
+                <div class="stat-item"><div class="stat-number">${totalTasks}</div><div class="stat-label">上报次数</div></div>
                 <div class="stat-item"><div class="stat-number">${userStats.length}</div><div class="stat-label">参与用户数</div></div>
                 <div class="stat-item"><div class="stat-number">${totalSubmitted}</div><div class="stat-label">成功提交</div></div>
                 <div class="stat-item"><div class="stat-number">${totalFailed}</div><div class="stat-label">失败</div></div>
@@ -496,8 +585,7 @@
             document.getElementById('userStatsTable').innerHTML = '<div style="padding: 20px; text-align: center;">暂无自动上报数据</div>';
             return;
         }
-        let html = `<table class="user-stats-table">
-            <thead><tr><th>用户UID</th><th>上报次数</th><th>总解析数</th><th>成功</th><th>失败</th><th>白名单跳过</th><th>平均耗时(s)</th><th>日常/临时</th></tr></thead><tbody>`;
+        let html = `<table class="user-stats-table"><thead><tr><th>用户UID</th><th>上报次数</th><th>已处理总数</th><th>成功</th><th>失败</th><th>白名单跳过</th><th>平均耗时(s)</th><th>日常/临时</th></tr></thead><tbody>`;
         for (const u of userStats) {
             html += `<tr>
                 <td><code>${u.uid}</code></td>
@@ -512,13 +600,10 @@
         }
         html += `</tbody></table>`;
         document.getElementById('userStatsTable').innerHTML = html;
+        document.getElementById('dedupIndicator').innerHTML = dedupEnabled ? '去重已启用' : '';
     }
 
-    let allRecords = [];
-    let currentSortColumn = 'timestamp';
-    let currentSortOrder = 'desc';
-    let currentTypeFilter = '';
-
+    // 明细表格排序
     function sortRecords(records, col, order) {
         return [...records].sort((a,b) => {
             let va = a[col] ?? '', vb = b[col] ?? '';
@@ -534,12 +619,10 @@
         let filtered = allRecords;
         if (currentTypeFilter) filtered = allRecords.filter(r => r.taskType === currentTypeFilter);
         const sorted = sortRecords(filtered, currentSortColumn, currentSortOrder);
-
         const headers = ['用户UID', '任务类型', '解析总数', '提交成功', '失败', '白名单跳过', '耗时(秒)', '上报时间', '服务器接收时间'];
         const keys = ['userUid', 'taskType', 'totalParsed', 'submitted', 'failed', 'whitelistSkipped', 'durationSeconds', 'timestamp', 'received_at'];
-
         let html = `<table class="data-table" id="detailTable"><thead><tr>`;
-        for (let i=0;i<headers.length;i++) {
+        for (let i=0; i<headers.length; i++) {
             const key = keys[i];
             const isCurr = key === currentSortColumn;
             const arrow = isCurr ? (currentSortOrder === 'asc' ? ' ▲' : ' ▼') : '';
@@ -557,8 +640,7 @@
         }
         html += `</tbody></table>`;
         document.getElementById('detailTableContainer').innerHTML = html;
-        document.getElementById('recordCount').innerHTML = `共 ${sorted.length} 条记录 (包含手动上报)`;
-
+        document.getElementById('recordCount').innerHTML = `共 ${sorted.length} 条记录 (原始数据)`;
         document.querySelectorAll('#detailTable th').forEach(th => {
             th.addEventListener('click', () => {
                 const key = th.getAttribute('data-key');
@@ -593,14 +675,18 @@
         alert('JSON 导出成功');
     }
 
+    async function refreshStats() {
+        const userStats = computeUserStats(allRecords, dedupEnabled);
+        renderGlobalStats(allRecords, userStats, dedupEnabled);
+        renderUserStatsTable(userStats);
+    }
+
     async function main() {
         const container = document.getElementById('detailTableContainer');
         container.innerHTML = '<div class="loading">加载数据…</div>';
         try {
             allRecords = await loadAllData();
-            const userStats = computeUserStats(allRecords);
-            renderGlobalStats(allRecords, userStats);
-            renderUserStatsTable(userStats);
+            await refreshStats();
             renderDetailTable();
         } catch (err) {
             console.error(err);
@@ -612,7 +698,7 @@
         }
     }
 
-    document.getElementById('refreshBtn').addEventListener('click', main);
+    document.getElementById('refreshBtn').addEventListener('click', () => main());
     document.getElementById('downloadCsvBtn').addEventListener('click', () => {
         if (!allRecords.length) { alert('暂无数据'); return; }
         const filtered = currentTypeFilter ? allRecords.filter(r => r.taskType === currentTypeFilter) : allRecords;
@@ -626,6 +712,10 @@
     document.getElementById('typeFilter').addEventListener('change', (e) => {
         currentTypeFilter = e.target.value;
         renderDetailTable();
+    });
+    document.getElementById('dedupToggle').addEventListener('change', (e) => {
+        dedupEnabled = e.target.checked;
+        refreshStats();
     });
 
     main();
