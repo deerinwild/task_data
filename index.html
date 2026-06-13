@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>任务数据看板</title>
+    <title>任务数据看板 | 按微博UID统计</title>
     <style>
         * {
             margin: 0;
@@ -350,13 +350,14 @@
 <body>
 <div class="container">
     <div class="card header">
-        <h1>任务数据看板</h1>
+        <h1>任务数据看板 <span style="font-size: 16px;">(按微博UID统计)</span></h1>
         <div class="subtitle">个人统计 & 上报明细</div>
         <div class="badge-group">
             <span class="badge">自动同步</span>
-            <span class="badge">定期存储</span>
+            <span class="badge">永久存储</span>
             <span class="badge">实时刷新</span>
             <span class="badge">智能去重</span>
+            <span class="badge">微博聚合</span>
         </div>
     </div>
 
@@ -376,7 +377,7 @@
         </div>
         <div class="stat-card">
             <div class="stat-header">
-                <span>个人统计</span>
+                <span>个人统计 (按微博UID)</span>
                 <span style="font-size:12px; font-weight:normal;" id="dedupIndicator"></span>
             </div>
             <div class="user-table-wrapper" id="userStatsTable"><div class="loading">加载中…</div></div>
@@ -401,13 +402,14 @@
     </div>
 
     <div class="detail-section">
-        <div class="section-title">上报明细 <span style="font-size:12px; font-weight:normal;">(原始数据，不受去重影响)</span></div>
+        <div class="section-title">上报明细 <span style="font-size:12px; font-weight:normal;">(原始数据，不受去重和映射影响)</span></div>
         <div class="table-wrapper" id="detailTableContainer"><div class="loading">加载中…</div></div>
     </div>
 
     <div class="footer">
-        数据实时获取，网络可能稍有延迟。<br>
-        去重规则：同一用户，若总解析数和白名单数相同，且任意两条记录时间差 ≤ 1小时，则只保留提交数最高的记录。
+        数据来源于 <code>reports_*.json</code> 独立文件 · GitHub API 实时获取<br>
+        去重规则：同一用户，若总解析数和白名单数相同，且记录时间差 ≤ 1小时，则只保留提交数最高的记录。<br>
+        映射文件：<code>mapping.json</code> 格式为 {"微博UID": ["豆瓣UID1", "豆瓣UID2"]}
     </div>
 </div>
 
@@ -415,10 +417,14 @@
     // ---------- 配置 ----------
     const GITHUB_API = 'https://api.github.com/repos/deerinwild/task_data/contents/';
     const RAW_BASE = 'https://raw.githubusercontent.com/deerinwild/task_data/main/';
-    const ONE_HOUR = 3600 * 1000; // 1小时毫秒数
+    const MAPPING_URL = RAW_BASE + 'mapping.json';
+    const ONE_HOUR = 3600 * 1000;
 
-    let dedupEnabled = true;
+    let dedupEnabled = false;
     let allRecords = [];
+    let userMapping = {}; // 微博UID -> 豆瓣UID数组
+    let reverseMapping = new Map(); // 豆瓣UID -> 微博UID (快速查找)
+
     let currentSortColumn = 'timestamp';
     let currentSortOrder = 'desc';
     let currentTypeFilter = '';
@@ -451,6 +457,37 @@
         return await res.json();
     }
 
+    // 加载映射文件
+    async function loadMapping() {
+        try {
+            const res = await fetch(MAPPING_URL, { headers: { 'User-Agent': 'DataViewer/1.0' } });
+            if (res.ok) {
+                const mapping = await res.json();
+                userMapping = mapping;
+                reverseMapping.clear();
+                for (const [weiboUser, doubanUids] of Object.entries(userMapping)) {
+                    for (const uid of doubanUids) {
+                        reverseMapping.set(uid, weiboUser);
+                    }
+                }
+                console.log('映射文件加载成功', userMapping);
+            } else {
+                console.warn('未找到 mapping.json，将按原始豆瓣UID显示');
+                userMapping = {};
+                reverseMapping.clear();
+            }
+        } catch (e) {
+            console.warn('加载映射文件失败', e);
+            userMapping = {};
+            reverseMapping.clear();
+        }
+    }
+
+    // 将豆瓣UID转换为微博用户名（如果没有映射则返回原UID）
+    function getDisplayUser(uid) {
+        return reverseMapping.get(uid) || uid;
+    }
+
     async function loadAllData() {
         const files = await fetchFileList();
         const records = [];
@@ -464,11 +501,9 @@
         return records;
     }
 
-    // 新的去重函数：按用户分组，对每个用户，找出所有 totalParsed 和 whitelistSkipped 相同的记录，
-    // 如果其中任意两条记录的时间戳差值 <= 1小时，则视为重复组，只保留 submitted 最高的那条。
+    // 去重函数：按原始豆瓣UID去重（因为映射后合并是在统计时进行的，去重应在映射前）
     function deduplicateRecords(records) {
-        // 先按用户分组
-        const userGroups = new Map(); // uid -> array
+        const userGroups = new Map();
         for (const r of records) {
             const uid = r.userUid;
             if (!uid) continue;
@@ -478,30 +513,24 @@
 
         const result = [];
         for (const [uid, userRecs] of userGroups.entries()) {
-            // 按时间戳排序（升序）
             const sorted = [...userRecs].sort((a,b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
-            const groups = []; // 存储去重后的组
             const used = new Array(sorted.length).fill(false);
-
             for (let i = 0; i < sorted.length; i++) {
                 if (used[i]) continue;
                 const current = sorted[i];
                 const total = current.totalParsed;
                 const white = current.whitelistSkipped;
-                // 找出与当前记录 totalParsed 和 whitelistSkipped 相同且时间差在1小时内的所有记录索引
                 const sameGroup = [i];
                 for (let j = i+1; j < sorted.length; j++) {
                     if (used[j]) continue;
                     const other = sorted[j];
                     if (other.totalParsed !== total || other.whitelistSkipped !== white) continue;
-                    // 检查时间差
                     const timeCurrent = new Date(current.timestamp).getTime();
                     const timeOther = new Date(other.timestamp).getTime();
                     if (Math.abs(timeCurrent - timeOther) <= ONE_HOUR) {
                         sameGroup.push(j);
                     }
                 }
-                // 如果找到多个，则选取其中 submitted 最大的那条
                 if (sameGroup.length > 1) {
                     let bestIdx = sameGroup[0];
                     for (let idx of sameGroup) {
@@ -510,7 +539,6 @@
                     result.push(sorted[bestIdx]);
                     sameGroup.forEach(idx => used[idx] = true);
                 } else {
-                    // 单个，直接保留
                     result.push(current);
                     used[i] = true;
                 }
@@ -519,19 +547,17 @@
         return result;
     }
 
-    // 统计基于自动上报 (durationSeconds > 0) 且可选去重
-    function computeUserStats(records, dedup) {
-        let autoRecords = records.filter(r => (r.durationSeconds || 0) > 0);
-        if (dedup) {
-            autoRecords = deduplicateRecords(autoRecords);
-        }
-        const map = new Map();
-        for (const r of autoRecords) {
+    // 统计：按微博用户聚合（传入去重后的记录）
+    function computeUserStats(records) {
+        const map = new Map(); // key: 显示用户名 (微博用户名或豆瓣UID)
+        for (const r of records) {
             const uid = r.userUid;
             if (!uid) continue;
-            if (!map.has(uid)) {
-                map.set(uid, {
-                    uid,
+            const displayUser = getDisplayUser(uid);
+            if (!map.has(displayUser)) {
+                map.set(displayUser, {
+                    displayUser: displayUser,
+                    doubanUids: new Set(),
                     total: 0,
                     submitted: 0,
                     failed: 0,
@@ -542,7 +568,8 @@
                     tempCount: 0
                 });
             }
-            const s = map.get(uid);
+            const s = map.get(displayUser);
+            s.doubanUids.add(uid);
             const processed = (r.submitted || 0) + (r.failed || 0) + (r.whitelistSkipped || 0);
             s.total += processed;
             s.submitted += r.submitted || 0;
@@ -553,17 +580,25 @@
             if (r.taskType === 'daily') s.dailyCount++;
             else if (r.taskType === 'temp') s.tempCount++;
         }
-        const stats = Array.from(map.values()).map(u => ({
-            ...u,
-            avgDuration: u.taskCount ? Math.round(u.totalDuration / u.taskCount) : 0
+        const stats = Array.from(map.values()).map(s => ({
+            displayUser: s.displayUser,
+            doubanUids: Array.from(s.doubanUids).join(', '),
+            total: s.total,
+            submitted: s.submitted,
+            failed: s.failed,
+            whitelistSkipped: s.whitelistSkipped,
+            avgDuration: s.taskCount ? Math.round(s.totalDuration / s.taskCount) : 0,
+            taskCount: s.taskCount,
+            dailyCount: s.dailyCount,
+            tempCount: s.tempCount
         }));
         stats.sort((a,b) => b.submitted - a.submitted);
         return stats;
     }
 
-    function renderGlobalStats(records, userStats, dedup) {
+    function renderGlobalStats(records, userStats) {
         let autoRecords = records.filter(r => (r.durationSeconds || 0) > 0);
-        if (dedup) autoRecords = deduplicateRecords(autoRecords);
+        if (dedupEnabled) autoRecords = deduplicateRecords(autoRecords);
         const totalTasks = autoRecords.length;
         const totalSubmitted = autoRecords.reduce((s,r) => s + (r.submitted || 0), 0);
         const totalFailed = autoRecords.reduce((s,r) => s + (r.failed || 0), 0);
@@ -571,7 +606,7 @@
         const html = `
             <div class="global-stats">
                 <div class="stat-item"><div class="stat-number">${totalTasks}</div><div class="stat-label">上报次数</div></div>
-                <div class="stat-item"><div class="stat-number">${userStats.length}</div><div class="stat-label">参与用户数</div></div>
+                <div class="stat-item"><div class="stat-number">${userStats.length}</div><div class="stat-label">参与用户数(微博)</div></div>
                 <div class="stat-item"><div class="stat-number">${totalSubmitted}</div><div class="stat-label">成功提交</div></div>
                 <div class="stat-item"><div class="stat-number">${totalFailed}</div><div class="stat-label">失败</div></div>
                 <div class="stat-item"><div class="stat-number">${totalWhitelist}</div><div class="stat-label">白名单跳过</div></div>
@@ -582,13 +617,27 @@
 
     function renderUserStatsTable(userStats) {
         if (!userStats.length) {
-            document.getElementById('userStatsTable').innerHTML = '<div style="padding: 20px; text-align: center;">暂无自动上报数据</div>';
+            document.getElementById('userStatsTable').innerHTML = '<div style="padding: 20px; text-align: center;">暂无数据</div>';
             return;
         }
-        let html = `<table class="user-stats-table"><thead><tr><th>用户UID</th><th>上报次数</th><th>已处理总数</th><th>成功</th><th>失败</th><th>白名单跳过</th><th>平均耗时(s)</th><th>日常/临时</th></tr></thead><tbody>`;
+        let html = `<table class="user-stats-table">
+            <thead><tr>
+                <th>用户(微博)</th>
+                <th>关联豆瓣UID</th>
+                <th>上报次数</th>
+                <th>已处理总数</th>
+                <th>成功</th>
+                <th>失败</th>
+                <th>白名单跳过</th>
+                <th>平均耗时(s)</th>
+                <th>日常/临时</th>
+            </tr>
+            </thead>
+            <tbody>`;
         for (const u of userStats) {
             html += `<tr>
-                <td><code>${u.uid}</code></td>
+                <td><strong>${u.displayUser}</strong></td>
+                <td><span style="font-size:11px; color:#6e6e73;">${u.doubanUids}</span></td>
                 <td>${u.taskCount}</td>
                 <td>${u.total}</td>
                 <td style="font-weight:500;">${u.submitted}</td>
@@ -603,12 +652,16 @@
         document.getElementById('dedupIndicator').innerHTML = dedupEnabled ? '去重已启用' : '';
     }
 
-    // 明细表格排序
+    // 明细表格（原始记录，不聚合，但可以显示转换后的用户名）
     function sortRecords(records, col, order) {
         return [...records].sort((a,b) => {
             let va = a[col] ?? '', vb = b[col] ?? '';
             if (col === 'totalParsed' || col === 'submitted' || col === 'failed' || col === 'whitelistSkipped' || col === 'durationSeconds') {
                 va = Number(va); vb = Number(vb);
+            }
+            if (col === 'userUid') {
+                va = getDisplayUser(va);
+                vb = getDisplayUser(vb);
             }
             if (order === 'asc') return va > vb ? 1 : -1;
             else return va < vb ? 1 : -1;
@@ -619,7 +672,7 @@
         let filtered = allRecords;
         if (currentTypeFilter) filtered = allRecords.filter(r => r.taskType === currentTypeFilter);
         const sorted = sortRecords(filtered, currentSortColumn, currentSortOrder);
-        const headers = ['用户UID', '任务类型', '解析总数', '提交成功', '失败', '白名单跳过', '耗时(秒)', '上报时间', '服务器接收时间'];
+        const headers = ['用户(微博)', '任务类型', '解析总数', '提交成功', '失败', '白名单跳过', '耗时(秒)', '上报时间', '服务器接收时间'];
         const keys = ['userUid', 'taskType', 'totalParsed', 'submitted', 'failed', 'whitelistSkipped', 'durationSeconds', 'timestamp', 'received_at'];
         let html = `<table class="data-table" id="detailTable"><thead><tr>`;
         for (let i=0; i<headers.length; i++) {
@@ -633,6 +686,7 @@
             html += `<tr>`;
             for (const k of keys) {
                 let val = row[k] ?? '';
+                if (k === 'userUid') val = getDisplayUser(val);
                 if (k === 'timestamp' || k === 'received_at') val = new Date(val).toLocaleString();
                 html += `<td>${val}</td>`;
             }
@@ -676,8 +730,10 @@
     }
 
     async function refreshStats() {
-        const userStats = computeUserStats(allRecords, dedupEnabled);
-        renderGlobalStats(allRecords, userStats, dedupEnabled);
+        let recordsForStats = allRecords;
+        if (dedupEnabled) recordsForStats = deduplicateRecords(allRecords);
+        const userStats = computeUserStats(recordsForStats);
+        renderGlobalStats(allRecords, userStats);
         renderUserStatsTable(userStats);
     }
 
@@ -685,6 +741,7 @@
         const container = document.getElementById('detailTableContainer');
         container.innerHTML = '<div class="loading">加载数据…</div>';
         try {
+            await loadMapping();          // 先加载映射
             allRecords = await loadAllData();
             await refreshStats();
             renderDetailTable();
