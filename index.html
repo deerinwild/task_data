@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>豆瓣举报任务数据总览</title>
+    <title>任务数据看板</title>
     <style>
         * {
             box-sizing: border-box;
@@ -54,6 +54,26 @@
         .btn-secondary:hover {
             background-color: #5a6268;
         }
+        .filter-group {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+            background: #f8f9fa;
+            padding: 10px 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .filter-group label {
+            font-weight: 600;
+            font-size: 13px;
+        }
+        select {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid #ced4da;
+            background-color: white;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
@@ -69,6 +89,11 @@
             font-weight: 600;
             position: sticky;
             top: 0;
+            cursor: pointer;
+            user-select: none;
+        }
+        th:hover {
+            background-color: #e9ecef;
         }
         tr:nth-child(even) {
             background-color: #fafafc;
@@ -91,15 +116,38 @@
             border-radius: 8px;
             margin-bottom: 20px;
         }
+        .toast-msg {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #333;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>📊 豆瓣举报任务数据总览</h1>
+    <h1>📊 豆瓣举报任务数据看板</h1>
+    <div class="filter-group">
+        <label>任务类型：</label>
+        <select id="typeFilter">
+            <option value="">全部</option>
+            <option value="daily">日常任务</option>
+            <option value="temp">临时任务</option>
+        </select>
+        <span id="recordCount" style="font-size:13px; color:#6e6e73; margin-left: auto;">加载中...</span>
+    </div>
     <div class="toolbar">
         <button id="downloadCsvBtn" class="btn">⬇️ 下载 CSV</button>
+        <button id="downloadJsonBtn" class="btn btn-secondary">📄 下载 JSON</button>
         <button id="refreshBtn" class="btn btn-secondary">🔄 刷新</button>
-        <span id="recordCount" style="font-size:13px; color:#6e6e73;">加载中...</span>
     </div>
     <div id="tableContainer">
         <div class="loading">正在加载数据...</div>
@@ -108,14 +156,30 @@
         数据来源：本仓库中的所有 <code>reports_*.json</code> 文件（每次上报自动生成）。页面通过 GitHub API 获取文件列表并合并展示。
     </div>
 </div>
+<div id="toastMsg" class="toast-msg"></div>
 
 <script>
+    // ---------- 配置 ----------
     const GITHUB_API = 'https://api.github.com/repos/deerinwild/task_data/contents/';
     const RAW_BASE = 'https://raw.githubusercontent.com/deerinwild/task_data/main/';
+    const TOKEN = null; // 私有仓库需要 Personal Access Token (classic)，权限勾选 repo
+    // 如果需要认证，请将上面的 null 替换为 'Bearer YOUR_TOKEN'
+    // 重要：请不要将 Token 硬编码在 HTML 中！应通过后端代理或环境变量处理。
+    // 这里为演示目的，私有仓库需要 Token，建议改用后端代理，但为了简化教程，此处假设仓库为公开。
+    // 由于您的仓库是私有的，您必须提供一个有 repo 权限的 Token。
+
+    // 获取请求头
+    function getHeaders() {
+        const headers = {};
+        if (TOKEN) {
+            headers['Authorization'] = TOKEN;
+        }
+        return headers;
+    }
 
     // 获取仓库中的所有 reports_*.json 文件
     async function fetchFileList() {
-        const response = await fetch(GITHUB_API);
+        const response = await fetch(GITHUB_API, { headers: getHeaders() });
         if (!response.ok) {
             throw new Error(`无法获取文件列表: ${response.status}`);
         }
@@ -130,7 +194,7 @@
     // 获取单个 JSON 文件内容
     async function fetchJSON(filename) {
         const url = RAW_BASE + filename;
-        const response = await fetch(url);
+        const response = await fetch(url, { headers: getHeaders() });
         if (!response.ok) {
             console.warn(`无法加载 ${filename}: ${response.status}`);
             return null;
@@ -146,7 +210,6 @@
         for (const file of files) {
             const data = await fetchJSON(file);
             if (data) {
-                // 每个独立文件应该是单条记录（对象）
                 if (typeof data === 'object' && !Array.isArray(data)) {
                     records.push(data);
                 } else if (Array.isArray(data)) {
@@ -157,24 +220,68 @@
         return records;
     }
 
+    // 显示提示消息
+    function showMsg(msg) {
+        const el = document.getElementById('toastMsg');
+        el.innerText = msg;
+        el.style.opacity = 1;
+        setTimeout(() => {
+            el.style.opacity = 0;
+        }, 2000);
+    }
+
+    // 排序函数
+    function sortRecords(records, column, order) {
+        return [...records].sort((a, b) => {
+            let valA = a[column] ?? '';
+            let valB = b[column] ?? '';
+            if (column === 'totalParsed' || column === 'submitted' || column === 'failed' || column === 'whitelistSkipped' || column === 'durationSeconds') {
+                valA = Number(valA);
+                valB = Number(valB);
+            }
+            if (order === 'asc') {
+                return valA > valB ? 1 : -1;
+            } else {
+                return valA < valB ? 1 : -1;
+            }
+        });
+    }
+
     // 渲染表格
+    let currentSortColumn = 'timestamp';
+    let currentSortOrder = 'desc';
+    let currentTypeFilter = '';
+    let allRecords = [];
+
     function renderTable(records) {
         if (records.length === 0) {
             document.getElementById('tableContainer').innerHTML = '<div class="loading">暂无数据</div>';
-            document.getElementById('recordCount').innerText = '总记录数: 0';
+            document.getElementById('recordCount').innerText = `总记录数: 0`;
             return;
         }
+
+        // 应用类型筛选
+        let filtered = records;
+        if (currentTypeFilter) {
+            filtered = records.filter(r => r.taskType === currentTypeFilter);
+        }
+
+        // 排序
+        const sorted = sortRecords(filtered, currentSortColumn, currentSortOrder);
 
         const headers = ['用户UID', '任务类型', '解析总数', '提交成功', '失败', '白名单跳过', '耗时(秒)', '上报时间', '服务器接收时间'];
         const keys = ['userUid', 'taskType', 'totalParsed', 'submitted', 'failed', 'whitelistSkipped', 'durationSeconds', 'timestamp', 'received_at'];
 
-        let html = '<div style="overflow-x: auto;"><table><thead><tr>';
-        for (const h of headers) {
-            html += `<th>${h}</th>`;
+        let html = '<div style="overflow-x: auto;"><table id="dataTable"><thead><tr>';
+        for (let i = 0; i < headers.length; i++) {
+            const key = keys[i];
+            const isCurrent = (key === currentSortColumn);
+            const arrow = isCurrent ? (currentSortOrder === 'asc' ? ' ▲' : ' ▼') : '';
+            html += `<th data-key="${key}">${headers[i]}${arrow}</th>`;
         }
         html += '</tr></thead><tbody>';
 
-        for (const row of records) {
+        for (const row of sorted) {
             html += '<tr>';
             for (const k of keys) {
                 let val = row[k] ?? '';
@@ -187,7 +294,21 @@
         }
         html += '</tbody></table></div>';
         document.getElementById('tableContainer').innerHTML = html;
-        document.getElementById('recordCount').innerText = `总记录数: ${records.length}`;
+        document.getElementById('recordCount').innerText = `总记录数: ${sorted.length}`;
+
+        // 绑定表头点击事件
+        document.querySelectorAll('#dataTable th').forEach(th => {
+            th.addEventListener('click', () => {
+                const key = th.getAttribute('data-key');
+                if (currentSortColumn === key) {
+                    currentSortOrder = currentSortOrder === 'asc' ? 'desc' : 'asc';
+                } else {
+                    currentSortColumn = key;
+                    currentSortOrder = 'asc';
+                }
+                renderTable(allRecords);
+            });
+        });
     }
 
     // 导出 CSV
@@ -204,16 +325,30 @@
         link.click();
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
+        showMsg('CSV 导出成功');
     }
 
-    let currentRecords = [];
+    // 导出 JSON
+    function exportToJSON(records) {
+        const jsonContent = JSON.stringify(records, null, 2);
+        const blob = new Blob([jsonContent], { type: 'application/json' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.href = url;
+        link.setAttribute('download', `task_data_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.json`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        showMsg('JSON 导出成功');
+    }
 
     async function main() {
         const container = document.getElementById('tableContainer');
         container.innerHTML = '<div class="loading">正在加载数据...</div>';
         try {
-            currentRecords = await loadAllData();
-            renderTable(currentRecords);
+            allRecords = await loadAllData();
+            renderTable(allRecords);
         } catch (err) {
             console.error(err);
             container.innerHTML = `<div class="error">加载失败: ${err.message}<br>请检查网络或确认仓库是公开的，且存在 reports_*.json 文件。</div>`;
@@ -223,11 +358,24 @@
 
     document.getElementById('refreshBtn').addEventListener('click', () => main());
     document.getElementById('downloadCsvBtn').addEventListener('click', () => {
-        if (currentRecords.length === 0) {
+        if (allRecords.length === 0) {
             alert('暂无数据可导出');
             return;
         }
-        exportToCSV(currentRecords);
+        const filtered = currentTypeFilter ? allRecords.filter(r => r.taskType === currentTypeFilter) : allRecords;
+        exportToCSV(filtered);
+    });
+    document.getElementById('downloadJsonBtn').addEventListener('click', () => {
+        if (allRecords.length === 0) {
+            alert('暂无数据可导出');
+            return;
+        }
+        const filtered = currentTypeFilter ? allRecords.filter(r => r.taskType === currentTypeFilter) : allRecords;
+        exportToJSON(filtered);
+    });
+    document.getElementById('typeFilter').addEventListener('change', (e) => {
+        currentTypeFilter = e.target.value;
+        renderTable(allRecords);
     });
 
     main();
