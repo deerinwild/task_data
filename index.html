@@ -65,11 +65,19 @@
             color: #1d1d1f;
         }
 
+        /* 调整卡片宽度：全局概览更窄，个人统计自动扩展 */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            grid-template-columns: minmax(280px, 360px) 1fr;
             gap: 16px;
             margin: 20px 0;
+        }
+
+        /* 移动端适配：小屏幕下依然堆叠 */
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         .stat-card {
