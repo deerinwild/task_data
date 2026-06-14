@@ -1,14 +1,14 @@
 [
   {
-    "userUid": "285005022",
+    "userUid": "295453634",
     "taskType": "temp",
-    "totalParsed": 315,
-    "submitted": 305,
+    "totalParsed": 317,
+    "submitted": 307,
     "failed": 0,
     "whitelistSkipped": 10,
-    "durationSeconds": 3495,
-    "timestamp": "2026-06-14T09:21:00.755691",
+    "durationSeconds": 3287,
+    "timestamp": "2026-06-14T10:06:52.232066",
     "clientType": "android-apk",
-    "received_at": "2026-06-14T01:21:02.437773"
+    "received_at": "2026-06-14T02:06:55.037896"
   }
 ]
