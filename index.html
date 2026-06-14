@@ -253,11 +253,10 @@ function renderGlobalStats(records, userStats) {
   const localTasks = recordsForGlobal.filter(r => normalizeTaskType(r.taskType) === 'local').length;
   document.getElementById('globalStats').innerHTML = `<div class="global-stats">
     <div class="stat-item"><div class="stat-number">${totalTasks}</div><div class="stat-label">上报次数</div></div>
-    <div class="stat-item"><div class="stat-number">${userStats.length}</div><div class="stat-label">参与用户数(微博)</div></div>
+    <div class="stat-item"><div class="stat-number">${userStats.length}</div><div class="stat-label">参与人数</div></div>
     <div class="stat-item"><div class="stat-number">${totalSubmitted}</div><div class="stat-label">成功提交</div></div>
     <div class="stat-item"><div class="stat-number">${totalFailed}</div><div class="stat-label">失败</div></div>
     <div class="stat-item"><div class="stat-number">${totalWhitelist}</div><div class="stat-label">白名单跳过</div></div>
-    <div class="stat-item"><div class="stat-number">${localTasks}</div><div class="stat-label">本地任务</div></div>
   </div>`;
 }
 function renderUserStatsTable(userStats) {
