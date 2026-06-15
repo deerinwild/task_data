@@ -1,0 +1,12 @@
+{
+  "userUid": "257740268",
+  "taskType": "temp",
+  "totalParsed": 2160,
+  "submitted": 495,
+  "failed": 478,
+  "whitelistSkipped": 34,
+  "durationSeconds": 4081,
+  "timestamp": "2026-06-16T01:34:24.836558",
+  "clientType": "android-apk",
+  "received_at": "2026-06-15T17:34:26.255677"
+}
