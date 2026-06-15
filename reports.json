@@ -1,26 +1,14 @@
 [
   {
-    "userUid": "152636908",
-    "taskType": "daily",
-    "timestamp": "2026-06-15T18:04:32.660Z",
-    "clientType": "chrome-extension",
-    "totalParsed": 2535,
-    "submitted": 1812,
-    "failed": 600,
-    "whitelistSkipped": 123,
-    "durationSeconds": 19430,
-    "received_at": "2026-06-15T18:04:54.737971"
-  },
-  {
-    "userUid": "287061660",
+    "userUid": "290588127",
     "taskType": "temp",
-    "totalParsed": 1306,
-    "submitted": 154,
-    "failed": 1134,
+    "timestamp": "2026-06-15T18:21:25.132Z",
+    "clientType": "chrome-extension",
+    "totalParsed": 1324,
+    "submitted": 673,
+    "failed": 633,
     "whitelistSkipped": 18,
-    "durationSeconds": 8925,
-    "timestamp": "2026-06-16T02:06:20.896203",
-    "clientType": "android-apk",
-    "received_at": "2026-06-15T18:06:22.626851"
+    "durationSeconds": 10371,
+    "received_at": "2026-06-15T18:21:47.680166"
   }
 ]
