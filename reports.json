@@ -1,74 +1,14 @@
 [
   {
-    "userUid": "1795503",
+    "userUid": "251815053",
     "taskType": "temp",
-    "totalParsed": 2236,
-    "submitted": 1537,
-    "failed": 561,
-    "whitelistSkipped": 12,
-    "durationSeconds": 19,
-    "timestamp": "2026-06-16T17:21:47.495947",
-    "clientType": "android-apk",
-    "received_at": "2026-06-16T09:22:08.915957"
-  },
-  {
-    "userUid": "291032081",
-    "taskType": "temp",
-    "totalParsed": 549,
-    "submitted": 545,
-    "failed": 2,
-    "whitelistSkipped": 2,
-    "durationSeconds": 6536,
-    "timestamp": "2026-06-16T17:22:49.282318",
-    "clientType": "android-apk",
-    "received_at": "2026-06-16T09:22:49.321904"
-  },
-  {
-    "userUid": "287485456",
-    "taskType": "temp",
-    "totalParsed": 949,
-    "submitted": 735,
-    "failed": 204,
-    "whitelistSkipped": 9,
-    "durationSeconds": 9764,
-    "timestamp": "2026-06-16T17:24:10.346019",
-    "clientType": "android-apk",
-    "received_at": "2026-06-16T09:24:11.984281"
-  },
-  {
-    "userUid": "295457177",
-    "taskType": "temp",
-    "totalParsed": 2677,
-    "submitted": 1362,
-    "failed": 1303,
-    "whitelistSkipped": 12,
-    "durationSeconds": 19761,
-    "timestamp": "2026-06-16T17:25:03.365862",
-    "clientType": "android-apk",
-    "received_at": "2026-06-16T09:25:04.468957"
-  },
-  {
-    "userUid": "283278108",
-    "taskType": "temp",
-    "totalParsed": 510,
-    "submitted": 507,
+    "timestamp": "2026-06-16T10:03:56.969Z",
+    "clientType": "chrome-extension",
+    "totalParsed": 923,
+    "submitted": 917,
     "failed": 1,
-    "whitelistSkipped": 2,
-    "durationSeconds": 6158,
-    "timestamp": "2026-06-16T17:25:25.753677",
-    "clientType": "android-apk",
-    "received_at": "2026-06-16T09:25:26.310401"
-  },
-  {
-    "userUid": "278865430",
-    "taskType": "temp",
-    "totalParsed": 1019,
-    "submitted": 14,
-    "failed": 1000,
     "whitelistSkipped": 5,
-    "durationSeconds": 5781,
-    "timestamp": "2026-06-16T17:28:44.114082",
-    "clientType": "android-apk",
-    "received_at": "2026-06-16T09:28:45.575605"
+    "durationSeconds": 6684,
+    "received_at": "2026-06-16T10:04:18.655324"
   }
 ]
