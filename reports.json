@@ -1678,5 +1678,17 @@
     "whitelistSkipped": 48,
     "durationSeconds": 13985,
     "received_at": "2026-06-18T06:49:21.580153"
+  },
+  {
+    "userUid": "291032081",
+    "taskType": "daily",
+    "totalParsed": 972,
+    "submitted": 0,
+    "failed": 1,
+    "whitelistSkipped": 0,
+    "durationSeconds": 6,
+    "timestamp": "2026-06-18T14:49:45.633660",
+    "clientType": "android-apk",
+    "received_at": "2026-06-18T06:49:45.673898"
   }
 ]
