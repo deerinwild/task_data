@@ -1,86 +1,14 @@
 [
   {
-    "userUid": "276285260",
+    "userUid": "280335717",
     "taskType": "daily",
-    "timestamp": "2026-06-19T11:41:13.272Z",
+    "timestamp": "2026-06-19T12:23:45.948Z",
     "clientType": "chrome-extension",
-    "totalParsed": 1739,
-    "submitted": 1739,
+    "totalParsed": 102,
+    "submitted": 102,
     "failed": 0,
     "whitelistSkipped": 0,
-    "durationSeconds": 7026,
-    "received_at": "2026-06-19T11:41:33.307535"
-  },
-  {
-    "userUid": "1795503",
-    "taskType": "temp",
-    "totalParsed": 667,
-    "submitted": 633,
-    "failed": 14,
-    "whitelistSkipped": 20,
-    "durationSeconds": 905,
-    "timestamp": "2026-06-19T19:44:29.513292",
-    "clientType": "android-apk",
-    "received_at": "2026-06-19T11:44:30.152025"
-  },
-  {
-    "userUid": "276482288",
-    "taskType": "local",
-    "timestamp": "2026-06-19T11:48:20.859Z",
-    "clientType": "chrome-extension",
-    "totalParsed": 3588,
-    "submitted": 3123,
-    "failed": 429,
-    "whitelistSkipped": 48,
-    "durationSeconds": 25248,
-    "received_at": "2026-06-19T11:48:24.991500"
-  },
-  {
-    "userUid": "226858695",
-    "taskType": "daily",
-    "totalParsed": 921,
-    "submitted": 449,
-    "failed": 32,
-    "whitelistSkipped": 0,
-    "durationSeconds": 6536,
-    "timestamp": "2026-06-19T21:58:18.524590",
-    "clientType": "android-apk",
-    "received_at": "2026-06-19T11:58:22.608083"
-  },
-  {
-    "userUid": "69333230",
-    "taskType": "temp",
-    "totalParsed": 617,
-    "submitted": 550,
-    "failed": 47,
-    "whitelistSkipped": 20,
-    "durationSeconds": 7767,
-    "timestamp": "2026-06-19T19:59:27.758298",
-    "clientType": "android-apk",
-    "received_at": "2026-06-19T11:59:29.215291"
-  },
-  {
-    "userUid": "285488756",
-    "taskType": "temp",
-    "timestamp": "2026-06-19T12:07:46.479Z",
-    "clientType": "chrome-extension",
-    "totalParsed": 548,
-    "submitted": 530,
-    "failed": 0,
-    "whitelistSkipped": 18,
-    "durationSeconds": 4248,
-    "received_at": "2026-06-19T12:07:47.264348"
-  },
-  {
-    "userUid": "257601039",
-    "taskType": "temp",
-    "totalParsed": 570,
-    "submitted": 540,
-    "failed": 10,
-    "whitelistSkipped": 20,
-    "durationSeconds": 6532,
-    "timestamp": "2026-06-19T20:08:15.750536",
-    "clientType": "android-apk",
-    "received_at": "2026-06-19T12:08:16.551287"
+    "durationSeconds": 830,
+    "received_at": "2026-06-19T12:24:07.553356"
   }
 ]
