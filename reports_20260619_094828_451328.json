@@ -1,0 +1,12 @@
+{
+  "userUid": "245846041",
+  "taskType": "local",
+  "timestamp": "2026-06-19T09:48:21.244Z",
+  "clientType": "chrome-extension",
+  "totalParsed": 30,
+  "submitted": 28,
+  "failed": 0,
+  "whitelistSkipped": 2,
+  "durationSeconds": 215,
+  "received_at": "2026-06-19T09:48:21.774925"
+}
