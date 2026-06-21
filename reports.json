@@ -1,74 +1,14 @@
 [
   {
-    "userUid": "156407051",
+    "userUid": "282772777",
     "taskType": "temp",
-    "totalParsed": 663,
-    "submitted": 634,
+    "totalParsed": 660,
+    "submitted": 631,
     "failed": 9,
     "whitelistSkipped": 20,
-    "durationSeconds": 9553,
-    "timestamp": "2026-06-21T12:10:08.319650",
+    "durationSeconds": 8123,
+    "timestamp": "2026-06-21T13:14:44.320202",
     "clientType": "android-apk",
-    "received_at": "2026-06-21T04:10:31.288366"
-  },
-  {
-    "userUid": "285491139",
-    "taskType": "temp",
-    "totalParsed": 663,
-    "submitted": 634,
-    "failed": 9,
-    "whitelistSkipped": 20,
-    "durationSeconds": 9622,
-    "timestamp": "2026-06-21T12:11:17.407549",
-    "clientType": "android-apk",
-    "received_at": "2026-06-21T04:11:19.133833"
-  },
-  {
-    "userUid": "127183090",
-    "taskType": "daily",
-    "totalParsed": 12,
-    "submitted": 12,
-    "failed": 0,
-    "whitelistSkipped": 0,
-    "durationSeconds": 124,
-    "timestamp": "2026-06-21T12:24:59.779398",
-    "clientType": "android-apk",
-    "received_at": "2026-06-21T04:25:01.432137"
-  },
-  {
-    "userUid": "250130299",
-    "taskType": "temp",
-    "totalParsed": 654,
-    "submitted": 609,
-    "failed": 25,
-    "whitelistSkipped": 20,
-    "durationSeconds": 12649,
-    "timestamp": "2026-06-21T12:26:32.399925",
-    "clientType": "android-apk",
-    "received_at": "2026-06-21T04:26:34.154247"
-  },
-  {
-    "userUid": "127183090",
-    "taskType": "daily",
-    "totalParsed": 12,
-    "submitted": 12,
-    "failed": 0,
-    "whitelistSkipped": 0,
-    "durationSeconds": 126,
-    "timestamp": "2026-06-21T12:31:08.651766",
-    "clientType": "android-apk",
-    "received_at": "2026-06-21T04:31:10.543078"
-  },
-  {
-    "userUid": "208435537",
-    "taskType": "local",
-    "timestamp": "2026-06-21T04:36:21.594Z",
-    "clientType": "chrome-extension",
-    "totalParsed": 15,
-    "submitted": 15,
-    "failed": 0,
-    "whitelistSkipped": 0,
-    "durationSeconds": 123,
-    "received_at": "2026-06-21T04:36:14.833662"
+    "received_at": "2026-06-21T05:15:07.257090"
   }
 ]
