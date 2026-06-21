@@ -1,14 +1,14 @@
 [
   {
-    "userUid": "239486049",
-    "taskType": "local",
-    "timestamp": "2026-06-21T17:42:49.917Z",
-    "clientType": "chrome-extension",
-    "totalParsed": 45,
-    "submitted": 585,
-    "failed": 0,
-    "whitelistSkipped": 0,
-    "durationSeconds": 6386,
-    "received_at": "2026-06-21T17:43:11.149128"
+    "userUid": "271740882",
+    "taskType": "temp",
+    "totalParsed": 615,
+    "submitted": 577,
+    "failed": 18,
+    "whitelistSkipped": 20,
+    "durationSeconds": 6589,
+    "timestamp": "2026-06-22T02:13:57.494620",
+    "clientType": "android-apk",
+    "received_at": "2026-06-21T18:14:19.780353"
   }
 ]
