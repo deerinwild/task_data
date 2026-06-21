@@ -1,74 +1,14 @@
 [
   {
-    "userUid": "278865430",
-    "taskType": "temp",
-    "totalParsed": 578,
-    "submitted": 521,
-    "failed": 37,
-    "whitelistSkipped": 20,
-    "durationSeconds": 6686,
-    "timestamp": "2026-06-21T10:36:46.170652",
-    "clientType": "android-apk",
-    "received_at": "2026-06-21T02:37:07.654685"
-  },
-  {
-    "userUid": "261708778",
-    "taskType": "daily",
-    "totalParsed": 106,
-    "submitted": 7,
-    "failed": 10,
-    "whitelistSkipped": 0,
-    "durationSeconds": 120,
-    "timestamp": "2026-06-21T10:37:41.437099",
-    "clientType": "android-apk",
-    "received_at": "2026-06-21T02:37:42.209259"
-  },
-  {
-    "userUid": "261708778",
-    "taskType": "daily",
-    "totalParsed": 106,
-    "submitted": 7,
-    "failed": 14,
-    "whitelistSkipped": 0,
-    "durationSeconds": 20,
-    "timestamp": "2026-06-21T10:38:13.054285",
-    "clientType": "android-apk",
-    "received_at": "2026-06-21T02:38:15.353296"
-  },
-  {
-    "userUid": "275161773",
-    "taskType": "daily",
-    "totalParsed": 106,
-    "submitted": 106,
-    "failed": 0,
-    "whitelistSkipped": 0,
-    "durationSeconds": 1271,
-    "timestamp": "2026-06-21T10:39:01.521856",
-    "clientType": "android-apk",
-    "received_at": "2026-06-21T02:39:02.842651"
-  },
-  {
-    "userUid": "282772777",
-    "taskType": "daily",
-    "totalParsed": 106,
-    "submitted": 106,
-    "failed": 0,
-    "whitelistSkipped": 0,
-    "durationSeconds": 1335,
-    "timestamp": "2026-06-21T10:39:56.207889",
-    "clientType": "android-apk",
-    "received_at": "2026-06-21T02:39:57.182967"
-  },
-  {
-    "userUid": "201637805",
+    "userUid": "285480531",
     "taskType": "local",
-    "timestamp": "2026-06-21T02:40:23.745Z",
+    "timestamp": "2026-06-21T03:11:15.522Z",
     "clientType": "chrome-extension",
-    "totalParsed": 634,
-    "submitted": 616,
+    "totalParsed": 33,
+    "submitted": 29,
     "failed": 0,
-    "whitelistSkipped": 18,
-    "durationSeconds": 4921,
-    "received_at": "2026-06-21T02:40:37.233928"
+    "whitelistSkipped": 4,
+    "durationSeconds": 198,
+    "received_at": "2026-06-21T03:11:37.582622"
   }
 ]
