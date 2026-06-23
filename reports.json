@@ -1,86 +1,14 @@
 [
   {
-    "userUid": "188677737",
+    "userUid": "285314413",
     "taskType": "local",
-    "timestamp": "2026-06-23T16:06:46.997Z",
+    "timestamp": "2026-06-23T17:41:12.469Z",
     "clientType": "chrome-extension",
-    "totalParsed": 3988,
-    "submitted": 2743,
-    "failed": 1222,
+    "totalParsed": 3142,
+    "submitted": 1880,
+    "failed": 303,
     "whitelistSkipped": 33,
-    "durationSeconds": 23669,
-    "received_at": "2026-06-23T16:07:09.905683"
-  },
-  {
-    "userUid": "152636908",
-    "taskType": "local",
-    "timestamp": "2026-06-23T16:10:48.735Z",
-    "clientType": "chrome-extension",
-    "totalParsed": 67,
-    "submitted": 66,
-    "failed": 1,
-    "whitelistSkipped": 0,
-    "durationSeconds": 427,
-    "received_at": "2026-06-23T16:10:50.518403"
-  },
-  {
-    "userUid": "152636908",
-    "taskType": "local",
-    "timestamp": "2026-06-23T16:20:44.126Z",
-    "clientType": "chrome-extension",
-    "totalParsed": 75,
-    "submitted": 73,
-    "failed": 2,
-    "whitelistSkipped": 0,
-    "durationSeconds": 507,
-    "received_at": "2026-06-23T16:20:45.873893"
-  },
-  {
-    "userUid": "279597787",
-    "taskType": "daily",
-    "timestamp": "2026-06-23T16:31:09.340Z",
-    "clientType": "chrome-extension",
-    "totalParsed": 2393,
-    "submitted": 1306,
-    "failed": 1,
-    "whitelistSkipped": 122,
-    "durationSeconds": 0,
-    "received_at": "2026-06-23T16:31:10.581688"
-  },
-  {
-    "userUid": "279597787",
-    "taskType": "daily",
-    "timestamp": "2026-06-23T16:33:47.600Z",
-    "clientType": "chrome-extension",
-    "totalParsed": 2393,
-    "submitted": 1337,
-    "failed": 1,
-    "whitelistSkipped": 122,
-    "durationSeconds": 17855,
-    "received_at": "2026-06-23T16:33:48.580062"
-  },
-  {
-    "userUid": "275549646",
-    "taskType": "local",
-    "timestamp": "2026-06-23T16:43:55.787Z",
-    "clientType": "chrome-extension",
-    "totalParsed": 1777,
-    "submitted": 1056,
-    "failed": 689,
-    "whitelistSkipped": 32,
-    "durationSeconds": 13165,
-    "received_at": "2026-06-23T16:43:57.632018"
-  },
-  {
-    "userUid": "152636908",
-    "taskType": "local",
-    "timestamp": "2026-06-23T16:44:04.655Z",
-    "clientType": "chrome-extension",
-    "totalParsed": 75,
-    "submitted": 75,
-    "failed": 0,
-    "whitelistSkipped": 0,
-    "durationSeconds": 481,
-    "received_at": "2026-06-23T16:44:05.072328"
+    "durationSeconds": 12531,
+    "received_at": "2026-06-23T17:41:37.119660"
   }
 ]
