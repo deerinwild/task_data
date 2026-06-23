@@ -1018,5 +1018,17 @@
     "timestamp": "2026-06-23T16:16:08.466785",
     "clientType": "android-apk",
     "received_at": "2026-06-23T08:16:09.517205"
+  },
+  {
+    "userUid": "235470748",
+    "taskType": "temp",
+    "totalParsed": 317,
+    "submitted": 317,
+    "failed": 0,
+    "whitelistSkipped": 0,
+    "durationSeconds": 4071,
+    "timestamp": "2026-06-23T16:16:08.652264",
+    "clientType": "android-apk",
+    "received_at": "2026-06-23T08:16:12.341742"
   }
 ]
