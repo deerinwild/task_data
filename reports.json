@@ -1,14 +1,14 @@
 [
   {
-    "userUid": "275549646",
+    "userUid": "275836660",
     "taskType": "local",
-    "timestamp": "2026-06-23T20:25:38.908Z",
+    "timestamp": "2026-06-23T23:05:13.056Z",
     "clientType": "chrome-extension",
-    "totalParsed": 1777,
-    "submitted": 925,
-    "failed": 820,
-    "whitelistSkipped": 32,
-    "durationSeconds": 12757,
-    "received_at": "2026-06-23T20:26:03.163056"
+    "totalParsed": 29,
+    "submitted": 29,
+    "failed": 0,
+    "whitelistSkipped": 0,
+    "durationSeconds": 164,
+    "received_at": "2026-06-23T23:05:36.932003"
   }
 ]
