@@ -1,74 +1,14 @@
 [
   {
-    "userUid": "293387933",
-    "taskType": "daily",
-    "timestamp": "2026-06-24T15:34:35.092Z",
-    "clientType": "chrome-extension",
-    "totalParsed": 1298,
-    "submitted": 1202,
-    "failed": 1,
-    "whitelistSkipped": 95,
-    "durationSeconds": 7197,
-    "received_at": "2026-06-24T15:34:35.952099"
-  },
-  {
-    "userUid": "285482908",
+    "userUid": "252685413",
     "taskType": "local",
-    "timestamp": "2026-06-24T15:37:07.826Z",
+    "timestamp": "2026-06-24T16:43:00.998Z",
     "clientType": "chrome-extension",
-    "totalParsed": 4522,
-    "submitted": 318,
-    "failed": 10,
+    "totalParsed": 2157,
+    "submitted": 2061,
+    "failed": 76,
     "whitelistSkipped": 21,
-    "durationSeconds": 0,
-    "received_at": "2026-06-24T15:37:10.562119"
-  },
-  {
-    "userUid": "275838399",
-    "taskType": "local",
-    "timestamp": "2026-06-24T15:39:16.423Z",
-    "clientType": "chrome-extension",
-    "totalParsed": 2892,
-    "submitted": 1962,
-    "failed": 909,
-    "whitelistSkipped": 21,
-    "durationSeconds": 23014,
-    "received_at": "2026-06-24T15:39:17.724341"
-  },
-  {
-    "userUid": "283517634",
-    "taskType": "local",
-    "timestamp": "2026-06-24T15:40:58.150Z",
-    "clientType": "chrome-extension",
-    "totalParsed": 68,
-    "submitted": 68,
-    "failed": 0,
-    "whitelistSkipped": 0,
-    "durationSeconds": 401,
-    "received_at": "2026-06-24T15:40:58.582223"
-  },
-  {
-    "userUid": "283517634",
-    "taskType": "local",
-    "timestamp": "2026-06-24T15:51:47.125Z",
-    "clientType": "chrome-extension",
-    "totalParsed": 68,
-    "submitted": 68,
-    "failed": 0,
-    "whitelistSkipped": 0,
-    "durationSeconds": 402,
-    "received_at": "2026-06-24T15:51:47.734446"
-  },
-  {
-    "userUid": "279597787",
-    "taskType": "local",
-    "timestamp": "2026-06-24T15:54:24.518Z",
-    "clientType": "chrome-extension",
-    "totalParsed": 3733,
-    "submitted": 2967,
-    "failed": 745,
-    "whitelistSkipped": 21,
-    "durationSeconds": 31194,
-    "received_at": "2026-06-24T15:54:26.128224"
+    "durationSeconds": 10929,
+    "received_at": "2026-06-24T16:43:24.078378"
   }
 ]
